@@ -1,0 +1,26 @@
+{
+  "name": "spot-my-lyrics-starter",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  },
+  "dependencies": {
+    "bull": "^4.1.1",
+    "cheerio": "^1.0.0-rc.10",
+    "firebase": "^9.1.2",
+    "got": "^11.8.3",
+    "mysql2": "^2.3.3",
+    "spotify-web-api-node": "^5.0.2",
+    "superagent": "^6.1.0"
+  }
+}

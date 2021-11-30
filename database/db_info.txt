@@ -1,0 +1,94 @@
+
+
+
+create table smlusers(userid varchar(200) primary key, email varchar(200), lastlogin datetime, lastsync datetime, loginattempts tinyint);
+
+
+
+create table smluserlyrics(url varchar(200) primary key, songname varchar(200), artistname varchar(200), albumart varchar(200), lyrics text, lyricsfound tinyint);
+
+        
+        
+create table smlplaylist(playlistid varchar(200) primary key, playlistname varchar(200), lastsynced datetime, totalsongs int, songswithlyrics int, songswithoutlyrics int);
+
+create table smlusersongmapping(userid varchar(50), url varchar(200), playlistid varchar(200),
+index user_idx (userid), index url_idx (url), index playlist_idx (playlistid),
+ FOREIGN KEY (userid)
+        REFERENCES smlusers(userid)
+        ON DELETE CASCADE, FOREIGN KEY (url)
+        REFERENCES smluserlyrics(url)
+        ON DELETE CASCADE, FOREIGN KEY (playlistid)
+        REFERENCES smlplaylist(playlistid)
+        ON DELETE CASCADE);
+
+
+
+call insertlryicsforuserplaylist('urltest', 'songtest','artisttest', 'alubmtest', 'lyricslyric',
+1,'Max','2K3742JOeB37mgaTzOk9Kb'); //
+
+
+IN url varchar(200), IN songname varchar(200), IN artistname varchar(200), IN albumart varchar(200), IN lyrics text, IN lyricsfound TINYINT, IN userid varchar(50), IN playlistid varchar(200))
+       BEGIN
+        
+
+ 
+ CREATE PROCEDURE userexists (IN userid VARCHAR(200), OUT founduser TINYINT)
+       BEGIN
+         SELECT COUNT(*) INTO founduser FROM spotmylyricsdb.smlusers
+         WHERE smlusers.userid = userid;
+       END//;
+
+
+CREATE PROCEDURE emailexists (IN email VARCHAR(200), OUT foundemail TINYINT)
+       BEGIN
+         SELECT COUNT(*) INTO foundemail FROM spotmylyricsdb.smlusers
+         WHERE smlusers.email = email;
+       END//
+       
+       
+CREATE PROCEDURE getuseridfromemail (IN email VARCHAR(200), OUT userid varchar(200))
+       BEGIN
+         SELECT smlusers.userid INTO userid FROM spotmylyricsdb.smlusers
+         WHERE smlusers.email = email;
+       END//
+       
+       
+CREATE PROCEDURE getlyricsforuser(IN userid VARCHAR(50), IN searchterm varchar(100))
+       BEGIN
+         SELECT * FROM spotmylyricsdb.smluserlyrics
+         JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.userid = userid
+         AND smluserlyrics.url = smlusersongmapping.url
+         WHERE smluserlyrics.lyrics LIKE CONCAT('%', searchterm, '%');
+       END//
+       
+CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playlistname varchar(200), IN totalsongs INT, IN songswithlyrics int, IN songswithoutlyrics int)
+       BEGIN
+         DECLARE playlistexists TINYINT DEFAULT 0;
+         
+         SELECT count(*) into playlistexists FROM spotmylyricsdb.smlplaylist
+         WHERE smlplaylist.playlistid = playlistid;
+         
+         IF(playlistexists = 1) THEN
+         	UPDATE spotmylyricsdb.smlplaylist
+         	set smlplaylist.totalsongs = totalsongs,
+         	smlplaylist.songswithlyrics = songswithlyrics,
+         	smlplaylist.songswithoutlyrics = songswithoutlyrics,
+         	smlplaylist.lastsynced = NOW()
+         	WHERE smlplaylist.playlistid = playlistid;
+         ELSE
+         	INSERT INTO spotmylyricsdb.smlplaylist values(playlistid, playlistname, NOW(), 
+         	totalsongs, songswithlyrics, songswithoutlyrics);
+         END IF;
+         
+       END//
+       
+
+         
+         
+       
+       
+       
+    
+
+       
+

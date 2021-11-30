@@ -1,0 +1,19 @@
+{
+    "configurations": [
+    {
+        "name": "Launch Chrome",
+        "request": "launch",
+        "type": "pwa-chrome",
+        "url": "http://localhost:3000",
+        "webRoot": "${workspaceFolder}",
+        "runtimeExecutable": "/snap/bin/chromium",
+      "runtimeArgs": [
+      "--new-window",
+      "-user-data-dir=/${workspaceFolder}/DevProfile",
+      "--remote-debugging-port=9222",
+     
+    
+    ]   
+}
+    ]
+}
