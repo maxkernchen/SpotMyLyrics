@@ -27,8 +27,7 @@ export async function scheduleLyricTask(playListID, username) {
 }
 async function lyricWork(workerData) {
     console.log(workerData.lyricJobPlayListID);
-    const playListTracks = await findPlayListTracks(workerData.lyricJobPlayListID);
-    console.log(playListTracks);
+    let playListTracks = await findPlayListTracks(workerData.lyricJobPlayListID);
 
     const playlistName = await findPlayListName(workerData.lyricJobPlayListID);
     console.log(playlistName);
@@ -37,7 +36,10 @@ async function lyricWork(workerData) {
     let totalsongs = playListTracks.length;
     let songswithlyrics = totalsongs;
     let songswithoutlyrics = 0;
+     // dont load any duplicate songs, spotify allows playlists to have duplicate songs.
     playListTracks = playListTracks.filter(removeDuplicateTracks);
+    console.log(playListTracks);
+
 
  
     await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, songswithlyrics, songswithoutlyrics);
@@ -47,22 +49,19 @@ async function lyricWork(workerData) {
         let songname = track.track.name;
         let url = track.track.external_urls.spotify;
         let albumart = track.track.album.images[0].url;
-        // dont load any duplicate songs, spotify allows playlists to have duplicate songs.
-        if(!tracksLoaded.includes(url)){
-            let songArtistStr = track.track.artists[0].name + ' ' + track.track.name;
-            console.log('fetching lyrics from web!');
+       
+     
+        let songArtistStr = track.track.artists[0].name + ' ' + track.track.name;
+        console.log('fetching lyrics from web!');
 
-            let lyrics = await findLyricsMusixMatch(songArtistStr.replace(/\s/g, '%20'));
-            console.log('inserting lyrics into db!');
+        let lyrics = await findLyricsMusixMatch(songArtistStr.replace(/\s/g, '%20'));
+        console.log('inserting lyrics into db!');
 
-            let lyricsfound = lyrics ? 1 : 0;
-            await callInsertLyricsForUserPlaylist(url, songname, artistname, albumart, lyrics, lyricsfound,
-                currentUser, playListID);
+        let lyricsfound = lyrics ? 1 : 0;
+        await callInsertLyricsForUserPlaylist(url, songname, artistname, albumart, lyrics, lyricsfound,
+            currentUser, playListID);
 
             
-        }
-
-
 
     });
     
@@ -125,9 +124,8 @@ async function findLyricsMusixMatch(songAndArtistName) {
     
 }
 
-function removeDuplicateTracks(track, index, self) {
-    let index2 = self.findIndex((t) => {
-        t.track.external_urls.spotify == track.track.external_urls.spotify;
-    })
-    return index === index2;
+function removeDuplicateTracks(track, index, array) {
+    return index === array.findIndex(t => (
+        t.track.external_urls.spotify === track.track.external_urls.spotify));
+
 }
