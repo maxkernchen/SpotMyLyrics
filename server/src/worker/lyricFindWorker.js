@@ -21,11 +21,12 @@ export async function scheduleLyricTask(playListID, username) {
     });
  
     queueJob.process(async (job) => {
-        return lyricWork(job.data);
+        return lyricWork(job);
     })
 
 }
-async function lyricWork(workerData) {
+async function lyricWork(job) {
+    const workerData = job.data;
     console.log(workerData.lyricJobPlayListID);
     let playListTracks = await findPlayListTracks(workerData.lyricJobPlayListID);
 
@@ -43,8 +44,9 @@ async function lyricWork(workerData) {
 
  
     await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, songswithlyrics, songswithoutlyrics);
-    await Object.values(playListTracks).forEach(async function(track) {
-
+    
+    for(let i = 0; i < playListTracks.length; i++){
+        let track = playListTracks[i];
         let artistname = track.track.artists[0].name;
         let songname = track.track.name;
         let url = track.track.external_urls.spotify;
@@ -61,9 +63,11 @@ async function lyricWork(workerData) {
         await callInsertLyricsForUserPlaylist(url, songname, artistname, albumart, lyrics, lyricsfound,
             currentUser, playListID);
 
-            
+        job.progress((i + 1 / playListTracks.length) * 100);
 
-    });
+        
+    }
+    console.log('Done!');
     
     return true;
 }
@@ -102,24 +106,26 @@ async function findPlayListName(playListID) {
 }
 
 async function findLyricsMusixMatch(songAndArtistName) {
+    let lyrics = '';
     let fullURl = baseMusixMatchSearchUrl + songAndArtistName + '/tracks';
     const response = await got(fullURl);
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 3000));
     let $ = await Cheerio.load(response.body);
     let firstSearchLink = $('h2.media-card-title').children();
-    let lyricLink = firstSearchLink[0].attribs.href;
-    let fullLyricUrl = baseMusixMatchUrl + lyricLink;
+    if(firstSearchLink){
+        let lyricLink = firstSearchLink[0].attribs.href;
+        let fullLyricUrl = baseMusixMatchUrl + lyricLink;
 
-    const responseLyrics = await got(fullLyricUrl);
-    await new Promise(r => setTimeout(r, 2000));
+        const responseLyrics = await got(fullLyricUrl);
+        await new Promise(r => setTimeout(r, 3000));
 
-    $ = await Cheerio.load(responseLyrics.body);
-    let lyricText = $('p.mxm-lyrics__content');
-    let lyrics = '';
-     for(let i = 0; i < lyricText.length; i++){
-        lyrics += lyricText[i].children[0].children[0].data;
+        $ = await Cheerio.load(responseLyrics.body);
+        let lyricText = $('p.mxm-lyrics__content');
+
+        for(let i = 0; i < lyricText.length; i++){
+            lyrics += lyricText[i].children[0].children[0].data;
+        }
     }
-
     return lyrics;
     
 }
