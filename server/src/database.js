@@ -91,7 +91,7 @@ export async function callEmailExists(pool, email){
     let conn = await getConnectionPool().promise().getConnection();
     if(conn){
       const [rows, fields] = 
-      await conn.connection.promise().query(storedProcCall, [url, songname, artistname, albumart, lyrics.toLowerCase(), lyricsfound, userid, playlistid]);
+      await conn.connection.promise().query(storedProcCall, [url, songname, artistname, albumart, lyrics, lyricsfound, userid, playlistid]);
       conn.connection.release();
       }
     }

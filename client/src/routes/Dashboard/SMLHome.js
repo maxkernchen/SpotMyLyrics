@@ -47,9 +47,8 @@ export default class SMLHome extends React.Component {
 
 
   async searchLyrics(searchTermStr){
-
     if(searchTermStr && searchTermStr.trim().length){
-      const payload = JSON.stringify({searchterm: searchTermStr.toLowerCase(), username: getCurrentUser()});
+      const payload = JSON.stringify({searchterm: searchTermStr.toLowerCase().trim(), username: getCurrentUser()});
       return fetch('http://localhost:3001/lyricsearch', {
         method: 'POST',
         headers: {
@@ -65,7 +64,7 @@ export default class SMLHome extends React.Component {
     async addPlayList(playListIDStr){
 
       if(playListIDStr && playListIDStr.trim().length){
-        const payload = JSON.stringify({playlistid: playListIDStr, username: getCurrentUser()});
+        const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: getCurrentUser()});
         return fetch('http://localhost:3001/addplaylist', {
           method: 'POST',
           headers: {
