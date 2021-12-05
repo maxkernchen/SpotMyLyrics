@@ -4,8 +4,10 @@ import Cheerio from 'cheerio';
 import got from 'got';
 import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
 
+
 const baseMusixMatchSearchUrl = 'https://www.musixmatch.com/search/'
 const baseMusixMatchUrl = 'https://www.musixmatch.com'
+const baseMusixMatchLyricUrl =  'https://www.musixmatch.com/lyrics/'
 
 
 export async function scheduleLyricTask(playListID, username) {
@@ -47,24 +49,23 @@ async function lyricWork(job) {
     
     for(let i = 0; i < playListTracks.length; i++){
         let track = playListTracks[i];
-        let artistname = track.track.artists[0].name;
-        let songname = track.track.name;
+        let artistName = track.track.artists[0].name.trim();
+        let songName = track.track.name.trim();
         let url = track.track.external_urls.spotify;
-        let albumart = track.track.album.images[0].url;
+        let albumArt = track.track.album.images[0].url;
        
      
-        let songArtistStr = track.track.artists[0].name + ' ' + track.track.name;
+        
         console.log('fetching lyrics from web!');
 
-        let lyrics = await findLyricsMusixMatch(songArtistStr.replace(/\s/g, '%20'), 
-                    track.track.artists[0].name);
+        let lyrics = await findLyricsMusixMatch(artistName, songName);
         console.log('inserting lyrics into db!');
 
-        let lyricsfound = lyrics ? 1 : 0;
-        if(lyricsfound === 0){
+        let lyricsFound = lyrics ? 1 : 0;
+        if(lyricsFound === 0){
             console.log('empty lyrics');
         }
-        await callInsertLyricsForUserPlaylist(url, songname, artistname, albumart, lyrics, lyricsfound,
+        await callInsertLyricsForUserPlaylist(url, songName, artistName, albumArt, lyrics, lyricsFound,
             currentUser, playListID);
 
         job.progress((i + 1 / playListTracks.length) * 100);
@@ -108,21 +109,28 @@ async function findPlayListName(playListID) {
     
 }
 
-async function findLyricsMusixMatch(songAndArtistName, artistName) {
-    let lyrics = '';
-    let fullURl = baseMusixMatchSearchUrl + songAndArtistName;
-    await new Promise(r => setTimeout(r, 5000));
-    const response = await got(fullURl);
-    let $ = await Cheerio.load(response.body);
-    let firstSearchLink = $('h2.media-card-title').children();
-    if(firstSearchLink && firstSearchLink.length > 0){
-        let lyricLink = firstSearchLink[0].attribs.href;
-        let fullLyricUrl = baseMusixMatchUrl + lyricLink;
-        lyrics = await getLyricsFromUrl(fullLyricUrl, artistName);
+async function findLyricsMusixMatch(artistName, songName) {
 
-    }
-    else{
-    console.log('couldnt find song link!')
+    let searchUrl = baseMusixMatchLyricUrl + artistName.replace(/\s/g, '-') 
+                    + '/' +  songName.replace(/\s/g, '-');
+    let lyrics = await getLyricsFromUrl(searchUrl, artistName, 1);
+
+    if(!lyrics){
+        let songArtistStr = artistName + ' ' + songName;
+        let fullURl = baseMusixMatchSearchUrl + songArtistStr.replace(/\s/g, '%20') + '/tracks';
+        await new Promise(r => setTimeout(r, 5000));
+        const response = await got(fullURl);
+        let $ = await Cheerio.load(response.body);
+        let firstSearchLink = $('h2.media-card-title').children();
+        if(firstSearchLink && firstSearchLink.length > 0){
+            let lyricLink = firstSearchLink[0].attribs.href;
+            let fullLyricUrl = baseMusixMatchUrl + lyricLink;
+            lyrics = await getLyricsFromUrl(fullLyricUrl, artistName, 3);
+
+        }
+        else{
+            console.log('couldnt find song link!')
+        }
     }
     return lyrics;
     
@@ -134,14 +142,19 @@ function removeDuplicateTracks(track, index, array) {
 
 }
 
-async function getLyricsFromUrl(songUrl, artistName){
+async function getLyricsFromUrl(songUrl, artistName, attempts){
     let lyrics = '';
-    let attempts = 3;
     let artistMatches = false;
     let $;
     do{
         await new Promise(r => setTimeout(r, 5000));
-        let responseLyrics = await got(songUrl);
+        let responseLyrics;
+        try {
+            responseLyrics = await got(songUrl);
+        }
+        catch(error){
+            return lyrics;
+        }
         $ = await Cheerio.load(responseLyrics.body);
         
         let artistNameFromPage = $('title');
@@ -160,7 +173,7 @@ async function getLyricsFromUrl(songUrl, artistName){
     if(artistMatches){
         let lyricText = $('p.mxm-lyrics__content');
         if(lyricText.length === 0){
-            console.log('Empty Lyrics!' + songUrl);
+            console.log('Empty Lyrics! '  + songUrl);
         }
         for(let i = 0; i < lyricText.length; i++){
             lyrics += lyricText[i].children[0].children[0].data;
