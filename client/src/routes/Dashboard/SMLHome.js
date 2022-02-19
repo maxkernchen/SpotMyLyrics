@@ -83,7 +83,7 @@ export default class SMLHome extends React.Component {
 
     if(results){
       console.log(results);
-      foundSongsList = results.map((song) => <li key={song.songname}>{song.songname} - {song.artistname}</li>);      
+      foundSongsList = results.map((song) => <li key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})</li>);      
     }
     
     return(

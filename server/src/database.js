@@ -74,9 +74,17 @@ export async function callEmailExists(pool, email){
       let rowResult = rows[0];
       if(rowResult){
         await Object.keys(rowResult).forEach(function(key) {
-          var row = rowResult[key];
+
+          // get about 25 characters of the matching term to display on the client side
+          let row = rowResult[key];
+          let lyrics = row.lyrics.toLowerCase();
+          let searchIndex = lyrics.indexOf(searchterm);
+          let endBoundSearch = searchIndex + config.maxHighlightLength > lyrics.length ? 
+                              lyrics.length - searchIndex : searchIndex + config.maxHighlightLength;
+          let highightedlyrics = lyrics.substring(searchIndex, endBoundSearch) + config.highLightEllipses;
+          // replace new line with space so it can fit into list element on client side
           if(row){
-            result.push({artistname: row.artistname, songname: row.songname});
+            result.push({artistname: row.artistname, songname: row.songname, highlight: highightedlyrics});
           }
         });
       }

@@ -53,10 +53,10 @@ async function lyricWork(job) {
         let songName = track.track.name.trim();
         let url = track.track.external_urls.spotify;
         let albumArt = track.track.album.images[0].url;
-       
-     
-        
+              
         console.log('fetching lyrics from web!');
+
+        
 
         let lyrics = await findLyricsMusixMatch(artistName, songName);
         console.log('inserting lyrics into db!');
@@ -176,7 +176,9 @@ async function getLyricsFromUrl(songUrl, artistName, attempts){
             console.log('Empty Lyrics! '  + songUrl);
         }
         for(let i = 0; i < lyricText.length; i++){
-            lyrics += lyricText[i].children[0].children[0].data;
+            // add space at the end of each paragraph to seperate the divs too
+            lyrics += lyricText[i].children[0].children[0].data + ' ';
+            
         }
     }
     else{
