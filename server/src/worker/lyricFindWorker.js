@@ -56,7 +56,6 @@ async function lyricWork(job) {
               
         console.log('fetching lyrics from web!');
 
-        
 
         let lyrics = await findLyricsMusixMatch(artistName, songName);
         console.log('inserting lyrics into db!');
