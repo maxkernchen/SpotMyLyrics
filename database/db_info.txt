@@ -22,15 +22,6 @@ index user_idx (userid), index url_idx (url), index playlist_idx (playlistid),
         ON DELETE CASCADE);
 
 
-
-call insertlryicsforuserplaylist('urltest', 'songtest','artisttest', 'alubmtest', 'lyricslyric',
-1,'Max','2K3742JOeB37mgaTzOk9Kb'); //
-
-
-IN url varchar(200), IN songname varchar(200), IN artistname varchar(200), IN albumart varchar(200), IN lyrics text, IN lyricsfound TINYINT, IN userid varchar(50), IN playlistid varchar(200))
-       BEGIN
-        
-
  
  CREATE PROCEDURE userexists (IN userid VARCHAR(200), OUT founduser TINYINT)
        BEGIN
@@ -61,26 +52,44 @@ CREATE PROCEDURE getlyricsforuser(IN userid VARCHAR(50), IN searchterm varchar(1
          WHERE LOWER(smluserlyrics.lyrics) LIKE CONCAT('%', searchterm, '%');
        END//
        
-CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playlistname varchar(200), IN totalsongs INT, IN songswithlyrics int, IN songswithoutlyrics int)
+CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playlistname varchar(200), IN totalsongs INT)
        BEGIN
          DECLARE playlistexists TINYINT DEFAULT 0;
+         DECLARE songswithoutlyrics INT DEFAULT 0;
          
          SELECT count(*) into playlistexists FROM spotmylyricsdb.smlplaylist
          WHERE smlplaylist.playlistid = playlistid;
          
          IF(playlistexists = 1) THEN
+         	
+         	SELECT count(*) into songswithoutlyrics FROM spotmylyricsdb.smlplaylist
+         	JOIN spotmylyricsdb.smlusersongmapping ON smlplaylist.playlistid = smlusersongmapping.playlistid
+         	JOIN spotmylyricsdb.smluserlyrics ON smluserlyrics.url = smlusersongmapping.url
+         	WHERE smluserlyrics.lyricsfound = 0 and smlplaylist.playlistid = playlistid;
+         	
          	UPDATE spotmylyricsdb.smlplaylist
          	set smlplaylist.totalsongs = totalsongs,
-         	smlplaylist.songswithlyrics = songswithlyrics,
+         	smlplaylist.songswithlyrics = totalsongs - songswithoutlyrics,
          	smlplaylist.songswithoutlyrics = songswithoutlyrics,
          	smlplaylist.lastsynced = NOW()
          	WHERE smlplaylist.playlistid = playlistid;
          ELSE
          	INSERT INTO spotmylyricsdb.smlplaylist values(playlistid, playlistname, NOW(), 
-         	totalsongs, songswithlyrics, songswithoutlyrics);
+         	totalsongs, totalsongs, 0);
          END IF;
          
        END//
+       
+CREATE PROCEDURE getuserplaylist(IN userid VARCHAR(50))
+       BEGIN
+       
+       
+         SELECT * FROM spotmylyricsdb.smluserlyrics
+         JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.userid = userid
+         AND smluserlyrics.url = smlusersongmapping.url
+         WHERE LOWER(smluserlyrics.lyrics) LIKE CONCAT('%', searchterm, '%');
+       END//
+
        
 
          

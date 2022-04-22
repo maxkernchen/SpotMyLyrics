@@ -55,11 +55,17 @@ app.post("/lyricsearch", async function(req, res){
     res.send({results: resultsLyricSearch});
   });
 
-  app.post("/addplaylist", async function(req, res){
-     scheduleLyricTask(req.body.playlistid, req.body.username);
-     res.send({results: 'scheduled task!'});
-     
-  });
+app.post("/addplaylist", async function(req, res){
+    scheduleLyricTask(req.body.playlistid, req.body.username);
+    res.send({results: 'scheduled task!'});
+    
+});
+
+app.post("/addplaylist", async function(req, res){
+  scheduleLyricTask(req.body.playlistid, req.body.username);
+  res.send({results: 'scheduled task!'});
+  
+});
   
   
 

@@ -60,6 +60,19 @@ export default class SMLHome extends React.Component {
     }
   }
 
+  async getExistingPlaylists(){
+      const payload = JSON.stringify({username: getCurrentUser()});
+      return fetch('http://localhost:3001/userExistingPlaylist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      })
+        .then(data => data.json())
+  }
+  
+
 
     async addPlayList(playListIDStr){
 

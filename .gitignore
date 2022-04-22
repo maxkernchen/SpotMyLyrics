@@ -30,3 +30,4 @@ node_modules
 server/src/config/config.js
 
 database/connect
+database/connect_delete

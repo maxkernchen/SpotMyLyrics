@@ -93,6 +93,41 @@ export async function callEmailExists(pool, email){
     return result;
   }
 
+  // get users active playlists and figure out how many songs in the playlist have lyrics
+  export async function callGetUserPlaylists(pool, userid){
+    let result = []
+
+    const storedProcCall = 'CALL getlyricsforuser(?, ?);';
+
+    let conn = await pool.promise().getConnection();
+    if(conn){
+      const [rows, fields] = 
+      await conn.connection.promise().query(storedProcCall, [userid, searchterm]);
+
+      conn.connection.release();
+      // get just query results from resultset
+      let rowResult = rows[0];
+      if(rowResult){
+        await Object.keys(rowResult).forEach(function(key) {
+
+          // get about 25 characters of the matching term to display on the client side
+          let row = rowResult[key];
+          let lyrics = row.lyrics.toLowerCase();
+          let searchIndex = lyrics.indexOf(searchterm);
+          let endBoundSearch = searchIndex + config.maxHighlightLength > lyrics.length ? 
+                              lyrics.length - searchIndex : searchIndex + config.maxHighlightLength;
+          let highightedlyrics = lyrics.substring(searchIndex, endBoundSearch) + config.highLightEllipses;
+          // replace new line with space so it can fit into list element on client side
+          if(row){
+            result.push({artistname: row.artistname, songname: row.songname, highlight: highightedlyrics});
+          }
+        });
+      }
+    }
+    
+    return result;
+  }
+
 
    export async function callInsertLyricsForUserPlaylist(url, songname, artistname, albumart, lyrics, lyricsfound, userid, playlistid){
     const storedProcCall = 'CALL insertlryicsforuserplaylist(?, ?, ?, ? ,?, ?, ?, ?);';
@@ -104,12 +139,12 @@ export async function callEmailExists(pool, email){
       }
     }
 
-    export async function callInsertOrUpdateSmlPlaylist(playlistid, playlistname, totalsongs, songswithlyrics, songswithoutlyrics){
-      const storedProcCall = 'CALL insertorupdatesmlplaylist(?, ?, ?, ? ,?);';
+    export async function callInsertOrUpdateSmlPlaylist(playlistid, playlistname, totalsongs){
+      const storedProcCall = 'CALL insertorupdatesmlplaylist(?, ?, ?);';
       let conn = await getConnectionPool().promise().getConnection();
       if(conn){
         const [rows, fields] = 
-        await conn.connection.promise().query(storedProcCall, [playlistid, playlistname, totalsongs, songswithlyrics, songswithoutlyrics]);
+        await conn.connection.promise().query(storedProcCall, [playlistid, playlistname, totalsongs]);
         conn.connection.release();
         }
       }

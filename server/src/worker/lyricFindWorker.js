@@ -1,6 +1,6 @@
 import Bull from 'bull';
 import { getCurrentApiObj } from '../api/spotifyApiCaller.js';
-import Cheerio from 'cheerio';
+import * as Cheerio from 'cheerio';
 import got from 'got';
 import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
 
@@ -45,18 +45,18 @@ async function lyricWork(job) {
 
 
  
-    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, songswithlyrics, songswithoutlyrics);
+    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs);
     
     for(let i = 0; i < playListTracks.length; i++){
         let track = playListTracks[i];
         let artistName = track.track.artists[0].name.trim();
         let songName = track.track.name.trim();
         let url = track.track.external_urls.spotify;
-        let albumArt = track.track.album.images[0].url;
+        let albumArt = track.track.album.images[0].url;;
               
         console.log('fetching lyrics from web!');
-
-
+        
+        // TODO if song exists already in DB dont fetch from musix
         let lyrics = await findLyricsMusixMatch(artistName, songName);
         console.log('inserting lyrics into db!');
 
@@ -72,6 +72,9 @@ async function lyricWork(job) {
         
     }
     console.log('Done!');
+    // update playlist again as we now know songs with and
+    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs);
+
     
 }
 
@@ -112,6 +115,7 @@ async function findLyricsMusixMatch(artistName, songName) {
 
     let searchUrl = baseMusixMatchLyricUrl + artistName.replace(/\s/g, '-') 
                     + '/' +  songName.replace(/\s/g, '-');
+    // try to find lyrics with just the artist and song name
     let lyrics = await getLyricsFromUrl(searchUrl, artistName, 1);
 
     if(!lyrics){
@@ -121,10 +125,11 @@ async function findLyricsMusixMatch(artistName, songName) {
         const response = await got(fullURl);
         let $ = await Cheerio.load(response.body);
         let firstSearchLink = $('h2.media-card-title').children();
+
         if(firstSearchLink && firstSearchLink.length > 0){
-            let lyricLink = firstSearchLink[0].attribs.href;
+            let lyricLink = firstSearchLink[0].attribs.href
             let fullLyricUrl = baseMusixMatchUrl + lyricLink;
-            lyrics = await getLyricsFromUrl(fullLyricUrl, artistName, 3);
+            lyrics = await getLyricsFromUrl(fullLyricUrl, artistName, 5);
 
         }
         else{
