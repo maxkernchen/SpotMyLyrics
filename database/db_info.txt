@@ -82,12 +82,10 @@ CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playli
        
 CREATE PROCEDURE getuserplaylist(IN userid VARCHAR(50))
        BEGIN
-       
-       
-         SELECT * FROM spotmylyricsdb.smluserlyrics
-         JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.userid = userid
-         AND smluserlyrics.url = smlusersongmapping.url
-         WHERE LOWER(smluserlyrics.lyrics) LIKE CONCAT('%', searchterm, '%');
+         SELECT distinct p.* FROM spotmylyricsdb.smlplaylist p
+         JOIN spotmylyricsdb.smlusersongmapping mp ON mp.userid = userid
+         AND p.playlistid = mp.playlistid;
+         
        END//
 
        

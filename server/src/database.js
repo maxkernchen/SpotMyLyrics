@@ -95,14 +95,14 @@ export async function callEmailExists(pool, email){
 
   // get users active playlists and figure out how many songs in the playlist have lyrics
   export async function callGetUserPlaylists(pool, userid){
-    let result = []
+    let result = [];
 
-    const storedProcCall = 'CALL getlyricsforuser(?, ?);';
+    const storedProcCall = 'CALL getuserplaylist(?);';
 
     let conn = await pool.promise().getConnection();
     if(conn){
       const [rows, fields] = 
-      await conn.connection.promise().query(storedProcCall, [userid, searchterm]);
+      await conn.connection.promise().query(storedProcCall, [userid]);
 
       conn.connection.release();
       // get just query results from resultset
@@ -110,16 +110,10 @@ export async function callEmailExists(pool, email){
       if(rowResult){
         await Object.keys(rowResult).forEach(function(key) {
 
-          // get about 25 characters of the matching term to display on the client side
           let row = rowResult[key];
-          let lyrics = row.lyrics.toLowerCase();
-          let searchIndex = lyrics.indexOf(searchterm);
-          let endBoundSearch = searchIndex + config.maxHighlightLength > lyrics.length ? 
-                              lyrics.length - searchIndex : searchIndex + config.maxHighlightLength;
-          let highightedlyrics = lyrics.substring(searchIndex, endBoundSearch) + config.highLightEllipses;
-          // replace new line with space so it can fit into list element on client side
           if(row){
-            result.push({artistname: row.artistname, songname: row.songname, highlight: highightedlyrics});
+            result.push({playlistname: row.playlistname, songswithlyrics: row.songswithlyrics, 
+              songswithoutlyrics: row.songswithoutlyrics, lastsynced: row.lastsynced});
           }
         });
       }
