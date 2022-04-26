@@ -2,11 +2,32 @@ import React from 'react';
 import { getCurrentUser } from '../../sessionStorage';
 import debounce from 'lodash.debounce';
 import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+class ToastMessageReact extends React.Component {
+  
+  displayMessage = () => {
+    toast.dismiss();
+    
+  }
+
+  render(){
+    return (
+      <div>
+        
+      </div>
+    );
+  }
+}
 
 
 export default class SMLHome extends React.Component {
+
+  
   constructor() {
     super()
+    toast.configure();
 
     this.state = {
       searchTerm: '',
@@ -42,7 +63,29 @@ export default class SMLHome extends React.Component {
     e.preventDefault();
     let results = await this.addPlayList(this.state.playList);
     console.log(results.results);
-    
+    if(results.results){
+      toast.success('Playlist Scheduled ' + results.results, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        });
+    }
+    else{
+      toast.error('Playlist not found!', {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        });
+    }
+
   }
 
   getExistPlayListOnClick = async (e) => {
@@ -83,7 +126,7 @@ export default class SMLHome extends React.Component {
   
 
 
-    async addPlayList(playListIDStr){
+  async addPlayList(playListIDStr){
 
       if(playListIDStr && playListIDStr.trim().length){
         const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: getCurrentUser()});
@@ -97,6 +140,19 @@ export default class SMLHome extends React.Component {
           .then(data => data.json());
       }
     }
+
+    getJobProgress(playListIDStr){
+      const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: getCurrentUser()});
+      return fetch('http://localhost:3001/getjobprogress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      })
+        .then(data => data.json());
+    }
+    
 
   render() { 
     
@@ -115,10 +171,8 @@ export default class SMLHome extends React.Component {
         existingPlayListList = playlistResults.map((pl) => <li key={pl.playlistname}>Name: {pl.playlistname} Songs w/Lyrics: 
         {pl.songswithlyrics} Songs w/o lyrics: {pl.songswithoutlyrics} Last Synced: {pl.lastsynced} 
         <Link to="/playlistlyrics">lyrics links
-        
         </Link>
         </li>);     
-        
     }
     
     return(

@@ -3,42 +3,57 @@ import { getCurrentApiObj } from '../api/spotifyApiCaller.js';
 import * as Cheerio from 'cheerio';
 import got from 'got';
 import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
+import { Job } from 'bull';
 
 
 const baseMusixMatchSearchUrl = 'https://www.musixmatch.com/search/'
 const baseMusixMatchUrl = 'https://www.musixmatch.com'
 const baseMusixMatchLyricUrl =  'https://www.musixmatch.com/lyrics/'
 
+const queueJob = new Bull('lyric-job-queue');
 
 export async function scheduleLyricTask(playListID, username) {
-    const queueJob = new Bull('lyric-job-queue');
-    const queueWorker = new Bull('lyric-worker-queue');
+  
+    // first confirm playlist exists then add to job queue.   
+    const playlistNameApi = await findPlayListName(playListID);
 
+    if(playlistNameApi){
+        // add job in seperate method so we don't block after getting playlist name
+       addLyricJob(playListID, username, playlistNameApi);
+    }
+    return playlistNameApi;
+}
 
-    const job = await queueJob.add({
-        lyricJobPlayListID:  playListID,
-        currentUserName: username
+async function addLyricJob(playListID, username, playlistNameApi){
 
+    let currentJob = await queueJob.getJob(playListID);
+    // dont add same job twice if user adds the same playlist while it's is already running.
+    if(!currentJob){
+        const job = await queueJob.add(playListID, {
+            lyricJobPlayListID:  playListID,
+            currentUserName: username,
+            playlistName: playlistNameApi
+        },{
+            jobId: playListID,
+        });
 
-    });
- 
-    queueJob.process(async (job) => {
-        lyricWork(job);
-    })
+        queueJob.process(async (job) => {
+            lyricWork(job);
+        })
+    }
 
 }
+
 async function lyricWork(job) {
     const workerData = job.data;
+    const playlistName = workerData.playlistName;
     console.log(workerData.lyricJobPlayListID);
     let playListTracks = await findPlayListTracks(workerData.lyricJobPlayListID);
 
-    const playlistName = await findPlayListName(workerData.lyricJobPlayListID);
     console.log(playlistName);
     let currentUser = workerData.currentUserName;
     let playListID = workerData.lyricJobPlayListID;
     let totalsongs = playListTracks.length;
-    let songswithlyrics = totalsongs;
-    let songswithoutlyrics = 0;
      // dont load any duplicate songs, spotify allows playlists to have duplicate songs.
     playListTracks = playListTracks.filter(removeDuplicateTracks);
     console.log(playListTracks);
@@ -74,6 +89,9 @@ async function lyricWork(job) {
     console.log('Done!');
     // update playlist again as we now know songs with and
     await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs);
+    job.finished();
+    queueJob.close();
+   
 
     
 }
@@ -107,6 +125,7 @@ async function findPlayListName(playListID) {
             return playlistName;
           }, function(err) {
             console.error(err);
+            return playlistName;
           });
     
 }
@@ -138,6 +157,10 @@ async function findLyricsMusixMatch(artistName, songName) {
     }
     return lyrics;
     
+}
+
+export async function getJobProgress(username, playListID) {
+    console.log(queueJob)
 }
 
 function removeDuplicateTracks(track, index, array) {

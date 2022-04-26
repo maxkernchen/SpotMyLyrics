@@ -21,6 +21,9 @@
     "firebase": "^9.1.2",
     "got": "^11.8.3",
     "mysql2": "^2.3.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-toastify": "^8.2.0",
     "spotify-web-api-node": "^5.0.2",
     "superagent": "^6.1.0"
   }

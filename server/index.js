@@ -5,7 +5,7 @@ import mysql from "mysql2";
 import mysqlPromsie from "mysql2/promise";
 import firebaseLogin from "./src/auth.js";
 import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, callGetUserPlaylists} from "./src/database.js";
-import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
+import { scheduleLyricTask, getJobProgress } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
 
 
@@ -56,20 +56,21 @@ app.post("/lyricsearch", async function(req, res){
   });
 
 app.post("/addplaylist", async function(req, res){
-    scheduleLyricTask(req.body.playlistid, req.body.username);
-    res.send({results: 'scheduled task!'});
+    let resultsAddPlaylist =  await scheduleLyricTask(req.body.playlistid, req.body.username);
+    res.send({results: resultsAddPlaylist});
     
 });
 
-app.post("/addplaylist", async function(req, res){
-  scheduleLyricTask(req.body.playlistid, req.body.username);
-  res.send({results: 'scheduled task!'});
-  
-});
+
 
 app.post("/userplaylists", async function(req, res){
   let resultsUserPlaylist = await callGetUserPlaylists(pool, req.body.username);
   res.send({results: resultsUserPlaylist});
+  
+});
+
+app.post("/getjobprogress", async function(req, res){
+  await getJobProgress(req.body.username, req.body.playlistid);
   
 });
   
