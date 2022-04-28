@@ -1,25 +1,10 @@
-import React from 'react';
+import React from "react";
 import { getCurrentUser } from '../../sessionStorage';
 import debounce from 'lodash.debounce';
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-class ToastMessageReact extends React.Component {
-  
-  displayMessage = () => {
-    toast.dismiss();
-    
-  }
-
-  render(){
-    return (
-      <div>
-        
-      </div>
-    );
-  }
-}
 
 
 export default class SMLHome extends React.Component {
@@ -33,11 +18,16 @@ export default class SMLHome extends React.Component {
       searchTerm: '',
       searchResults: [],
       playList: '',
-      existingPlaylists: []
+      existingPlaylists: [],
+      listening: false,
+      playListProgress: []
     };
+
+   
 
     this.searchLyricsDebounced = debounce(this.searchLyricsDebounceCall, 500);
 
+  
   }
 
   handleInputChangeLyricSearch = (e) => {
@@ -59,20 +49,14 @@ export default class SMLHome extends React.Component {
 
   }
 
+  
+
   addPlayListSubmit = async (e) => {
     e.preventDefault();
     let results = await this.addPlayList(this.state.playList);
     console.log(results.results);
     if(results.results){
-      toast.success('Playlist Scheduled ' + results.results, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: false,
-        progress: undefined,
-        });
+      this.createToast();
     }
     else{
       toast.error('Playlist not found!', {
@@ -85,6 +69,36 @@ export default class SMLHome extends React.Component {
         progress: undefined,
         });
     }
+
+    const events = new EventSource('http://localhost:3001/playlistprogress');
+
+      events.onmessage = (event) => {
+        const parsedData = JSON.parse(event.data);
+
+        console.log(parsedData);
+      };
+
+    
+
+  }
+
+  createToast(){
+    toast.success('Playlist Scheduled ', {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      });
+
+      fetch('http://localhost:3001/playlistprogress')
+      .then(res => res.text())
+      .then(text => console.log(text));
+
+      
+
 
   }
 
@@ -155,6 +169,10 @@ export default class SMLHome extends React.Component {
     
 
   render() { 
+
+   
+
+
     
     let searchResults = this.state.searchResults?.results;
     let playlistResults = this.state.existingPlaylists?.results;

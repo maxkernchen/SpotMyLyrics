@@ -3,6 +3,7 @@ import { getCurrentApiObj } from '../api/spotifyApiCaller.js';
 import * as Cheerio from 'cheerio';
 import got from 'got';
 import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
+import { updatePlayListProgress } from '../../index.js';
 import { Job } from 'bull';
 
 
@@ -11,6 +12,11 @@ const baseMusixMatchUrl = 'https://www.musixmatch.com'
 const baseMusixMatchLyricUrl =  'https://www.musixmatch.com/lyrics/'
 
 const queueJob = new Bull('lyric-job-queue');
+await queueJob.empty();
+await queueJob.clean(0, 'active');
+await queueJob.clean(0, 'completed');
+await queueJob.clean(0, 'delayed');
+await queueJob.clean(0, 'failed');
 
 export async function scheduleLyricTask(playListID, username) {
   
@@ -29,12 +35,13 @@ async function addLyricJob(playListID, username, playlistNameApi){
     let currentJob = await queueJob.getJob(playListID);
     // dont add same job twice if user adds the same playlist while it's is already running.
     if(!currentJob){
-        const job = await queueJob.add(playListID, {
+        const job = await queueJob.add( {
             lyricJobPlayListID:  playListID,
             currentUserName: username,
             playlistName: playlistNameApi
         },{
             jobId: playListID,
+            removeOnComplete: true
         });
 
         queueJob.process(async (job) => {
@@ -82,7 +89,9 @@ async function lyricWork(job) {
         await callInsertLyricsForUserPlaylist(url, songName, artistName, albumArt, lyrics, lyricsFound,
             currentUser, playListID);
 
-        job.progress((i + 1 / playListTracks.length) * 100);
+        let progress = (i + 1 / playListTracks.length) * 100;
+        updatePlayListProgress({playListID: playListID, username: currentUser, progress: progress});
+        
 
         
     }

@@ -19,6 +19,8 @@ app.use(express.urlencoded());
 app.use(express.json());
 initalizeSpotifyApi();
 
+let clients = [];
+
 
 
 export function getConnectionPool() {
@@ -73,7 +75,43 @@ app.post("/getjobprogress", async function(req, res){
   await getJobProgress(req.body.username, req.body.playlistid);
   
 });
+
+
+
+function progessHandler(request, response, next) {
+  const headers = {
+    'Content-Type': 'text/event-stream',
+    'Connection': 'keep-alive',
+    'Cache-Control': 'no-cache'
+  };
+  response.writeHead(200, headers);
+  let test = 'test SSE!';
+  const data = `data: ${JSON.stringify(test)}\n\n`;
+
+  response.write(data);
+
+  // TODO maybe replace with UUID
+  const clientId = Date.now();
+
+  const newClient = {
+    id: clientId,
+    response
+  };
+
+  clients.push(newClient);
+
+  request.on('close', () => {
+    console.log(`${clientId} Connection closed`);
+    clients = clients.filter(client => client.id !== clientId);
+  }); 
   
+}
+
+export function updatePlayListProgress(progressData){
+  clients.forEach(client => client.response.write(`data: ${JSON.stringify(progressData)}\n\n`))
+}
+
+app.get('/playlistprogress', progessHandler);
   
 
 app.listen(PORT, () => {
