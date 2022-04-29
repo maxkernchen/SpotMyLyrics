@@ -20,7 +20,8 @@ export default class SMLHome extends React.Component {
       playList: '',
       existingPlaylists: [],
       listening: false,
-      playListProgress: []
+      playListProgress: [],
+      toastId: ''
     };
 
    
@@ -56,7 +57,7 @@ export default class SMLHome extends React.Component {
     let results = await this.addPlayList(this.state.playList);
     console.log(results.results);
     if(results.results){
-      this.createToast();
+      this.createToast(results.results);
     }
     else{
       toast.error('Playlist not found!', {
@@ -76,26 +77,37 @@ export default class SMLHome extends React.Component {
         const parsedData = JSON.parse(event.data);
 
         console.log(parsedData);
+        if(parsedData.progress && this.state.toastId){
+          toast.update(this.state.toastId, {progress: parsedData.progress});
+          if(parsedData.progress === 1){
+            events.close();
+            this.setState({toastId: ''});
+          }
+        }
       };
 
     
 
   }
 
-  createToast(){
-    toast.success('Playlist Scheduled ', {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: false,
-      progress: undefined,
-      });
+  createToast(playListName){
+    if(!this.state.toastId){
+      let toastIdCreated = toast.success('Playlist Scheduled ' + playListName, {
+        position: "bottom-right",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: false,
+        progress: 0,
+        });
+
+      this.setState({toastId: toastIdCreated});
 
       fetch('http://localhost:3001/playlistprogress')
       .then(res => res.text())
       .then(text => console.log(text));
+    }
 
       
 

@@ -18,6 +18,15 @@ await queueJob.clean(0, 'completed');
 await queueJob.clean(0, 'delayed');
 await queueJob.clean(0, 'failed');
 
+//TODO best way to handle this?
+//if we use await if another job comes through it waits until it finishes
+// if we don't use it then we won't be able to track if a job is active or not.
+// maybe best thing is to allow user to only create one job at a time.
+// could try concurrency option. 
+queueJob.process( async (job) => {
+    await lyricWork(job);
+})
+
 export async function scheduleLyricTask(playListID, username) {
   
     // first confirm playlist exists then add to job queue.   
@@ -33,6 +42,7 @@ export async function scheduleLyricTask(playListID, username) {
 async function addLyricJob(playListID, username, playlistNameApi){
 
     let currentJob = await queueJob.getJob(playListID);
+    let allJobs = await queueJob.getJobs(['active']);
     // dont add same job twice if user adds the same playlist while it's is already running.
     if(!currentJob){
         const job = await queueJob.add( {
@@ -43,11 +53,8 @@ async function addLyricJob(playListID, username, playlistNameApi){
             jobId: playListID,
             removeOnComplete: true
         });
-
-        queueJob.process(async (job) => {
-            lyricWork(job);
-        })
     }
+   
 
 }
 
@@ -89,18 +96,13 @@ async function lyricWork(job) {
         await callInsertLyricsForUserPlaylist(url, songName, artistName, albumArt, lyrics, lyricsFound,
             currentUser, playListID);
 
-        let progress = (i + 1 / playListTracks.length) * 100;
+        let progress = ((i + 1 )/ playListTracks.length);
         updatePlayListProgress({playListID: playListID, username: currentUser, progress: progress});
-        
-
         
     }
     console.log('Done!');
     // update playlist again as we now know songs with and
     await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs);
-    job.finished();
-    queueJob.close();
-   
 
     
 }
