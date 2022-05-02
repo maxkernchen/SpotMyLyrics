@@ -59,7 +59,7 @@ app.post("/lyricsearch", async function(req, res){
 
 app.post("/addplaylist", async function(req, res){
     let resultsAddPlaylist =  await scheduleLyricTask(req.body.playlistid, req.body.username);
-    res.send({results: resultsAddPlaylist});
+    res.send(resultsAddPlaylist);
     
 });
 

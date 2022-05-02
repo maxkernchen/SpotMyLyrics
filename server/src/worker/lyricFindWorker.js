@@ -5,6 +5,10 @@ import got from 'got';
 import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
 import { updatePlayListProgress } from '../../index.js';
 import { Job } from 'bull';
+import { config } from '../config/config.js';
+import { parse } from 'superagent';
+import format from 'string-format';
+
 
 
 const baseMusixMatchSearchUrl = 'https://www.musixmatch.com/search/'
@@ -23,7 +27,7 @@ await queueJob.clean(0, 'failed');
 // if we don't use it then we won't be able to track if a job is active or not.
 // maybe best thing is to allow user to only create one job at a time.
 // could try concurrency option. 
-queueJob.process( async (job) => {
+queueJob.process(2, async (job) => {
     await lyricWork(job);
 })
 
@@ -32,19 +36,38 @@ export async function scheduleLyricTask(playListID, username) {
     // first confirm playlist exists then add to job queue.   
     const playlistNameApi = await findPlayListName(playListID);
 
+    let retResponse = {};
+
+    
+
     if(playlistNameApi){
         // add job in seperate method so we don't block after getting playlist name
-       addLyricJob(playListID, username, playlistNameApi);
+        // make sure playlist job is not already running.
+        retResponse = addLyricJob(playListID, username, playlistNameApi);
     }
-    return playlistNameApi;
+    else{
+        retResponse = {error: format(config.errorPlaylistDoesNotExist, playListID), playListName: playlistNameApi};
+    }
+
+    return retResponse;
 }
 
 async function addLyricJob(playListID, username, playlistNameApi){
 
     let currentJob = await queueJob.getJob(playListID);
     let allJobs = await queueJob.getJobs(['active']);
+    let userRunningAnotherJob = false;
+    for(let i = 0; i < allJobs.length; i++){
+        let job = allJobs[i];
+        if(job.data.currentUserName === username){
+            userRunningAnotherJob = true;
+            break;
+        }
+
+    }
+    
     // dont add same job twice if user adds the same playlist while it's is already running.
-    if(!currentJob){
+    if(!currentJob && !userRunningAnotherJob){
         const job = await queueJob.add( {
             lyricJobPlayListID:  playListID,
             currentUserName: username,
@@ -53,8 +76,18 @@ async function addLyricJob(playListID, username, playlistNameApi){
             jobId: playListID,
             removeOnComplete: true
         });
+
+        
     }
-   
+    else if (currentJob){
+        return {error: format(config.errorPlayListAlreadyRunning, playlistNameApi), playListName: playlistNameApi};
+    }
+    else if(userRunningAnotherJob){
+        return {error: config.errorUserAlreadyRunningJob, playListName: playlistNameApi};
+    }
+
+
+    return {playListName: playlistNameApi};
 
 }
 
@@ -97,7 +130,8 @@ async function lyricWork(job) {
             currentUser, playListID);
 
         let progress = ((i + 1 )/ playListTracks.length);
-        updatePlayListProgress({playListID: playListID, username: currentUser, progress: progress});
+        updatePlayListProgress({playListID: playListID, playlistName: playlistName,
+             username: currentUser, progress: progress});
         
     }
     console.log('Done!');
