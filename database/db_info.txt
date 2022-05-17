@@ -54,7 +54,7 @@ CREATE PROCEDURE getlyricsforuser(IN userid VARCHAR(50), IN searchterm varchar(1
        
 CREATE PROCEDURE getlyrics(IN userid VARCHAR(50), IN url VARCHAR(1000))
        BEGIN
-         SELECT * FROM spotmylyricsdb.smluserlyrics
+         SELECT distinct artistname, songname, lyrics FROM spotmylyricsdb.smluserlyrics
          JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.userid = userid
          WHERE smluserlyrics.url = url;
        END//
