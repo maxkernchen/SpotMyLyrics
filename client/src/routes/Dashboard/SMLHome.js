@@ -50,6 +50,8 @@ export default class SMLHome extends React.Component {
 
   }
 
+ 
+
   
 
   addPlayListSubmit = async (e) => {
@@ -168,24 +170,11 @@ export default class SMLHome extends React.Component {
       }
     }
 
-    getJobProgress(playListIDStr){
-      const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: getCurrentUser()});
-      return fetch('http://localhost:3001/getjobprogress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: payload
-      })
-        .then(data => data.json());
-    }
-    
+
 
   render() { 
 
-   
-
-
+  
     
     let searchResults = this.state.searchResults?.results;
     let playlistResults = this.state.existingPlaylists?.results;
@@ -195,7 +184,13 @@ export default class SMLHome extends React.Component {
 
     if(searchResults){
       console.log(searchResults);
-      foundSongsList = searchResults.map((song) => <li key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})</li>);      
+      let searchLyrics = "/songlyrics?"
+ 
+      foundSongsList = searchResults.map((song) =>  <li key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})
+       
+         <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}>Full lyrics</Link>
+      </li>      
+      );
     }
     if(playlistResults){
         console.log(playlistResults);
@@ -230,6 +225,8 @@ export default class SMLHome extends React.Component {
         
         {foundSongsList}
     </div>
+
+    
   );
   }
 }

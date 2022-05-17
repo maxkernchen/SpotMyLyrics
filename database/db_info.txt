@@ -52,6 +52,13 @@ CREATE PROCEDURE getlyricsforuser(IN userid VARCHAR(50), IN searchterm varchar(1
          WHERE LOWER(smluserlyrics.lyrics) LIKE CONCAT('%', searchterm, '%');
        END//
        
+CREATE PROCEDURE getlyrics(IN userid VARCHAR(50), IN url VARCHAR(1000))
+       BEGIN
+         SELECT * FROM spotmylyricsdb.smluserlyrics
+         JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.userid = userid
+         WHERE smluserlyrics.url = url;
+       END//
+       
 CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playlistname varchar(200), IN totalsongs INT)
        BEGIN
          DECLARE playlistexists TINYINT DEFAULT 0;

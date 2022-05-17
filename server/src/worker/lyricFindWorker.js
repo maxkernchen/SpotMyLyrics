@@ -204,9 +204,6 @@ async function findLyricsMusixMatch(artistName, songName) {
     
 }
 
-export async function getJobProgress(username, playListID) {
-    console.log(queueJob)
-}
 
 function removeDuplicateTracks(track, index, array) {
     return index === array.findIndex(t => (

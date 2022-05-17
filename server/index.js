@@ -4,8 +4,9 @@ import path from "express";
 import mysql from "mysql2";
 import mysqlPromsie from "mysql2/promise";
 import firebaseLogin from "./src/auth.js";
-import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, callGetUserPlaylists} from "./src/database.js";
-import { scheduleLyricTask, getJobProgress } from "./src/worker/lyricFindWorker.js";
+import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, 
+  callGetUserPlaylists, callGetLyrics} from "./src/database.js";
+import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
 
 
@@ -63,6 +64,10 @@ app.post("/addplaylist", async function(req, res){
     
 });
 
+app.post("/getlyrics", async function(req, res){
+  let resultsFullLyrics = await callGetLyrics(pool, req.body.username, req.body.songurl);
+  res.send({results: resultsFullLyrics});
+});
 
 
 app.post("/userplaylists", async function(req, res){
@@ -71,10 +76,6 @@ app.post("/userplaylists", async function(req, res){
   
 });
 
-app.post("/getjobprogress", async function(req, res){
-  await getJobProgress(req.body.username, req.body.playlistid);
-  
-});
 
 
 

@@ -7,6 +7,7 @@ import Login from './routes/Login/Login';
 import {useToken, useUserID} from "./sessionStorage";
 import SMLHome from "./routes/Dashboard/SMLHome";
 import PlayListLyrics from "./routes/Dashboard/PlayListLyrics"
+import SongLyrics from "./routes/Dashboard/SongLyrics";
 
 
 
@@ -39,6 +40,9 @@ function App() {
             </Route>
             <Route path="/playlistlyrics">
               <PlayListLyrics />
+            </Route>
+            <Route path="/songlyrics">
+              <SongLyrics />
             </Route>
           </Switch>
         </BrowserRouter>

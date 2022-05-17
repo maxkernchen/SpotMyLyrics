@@ -84,7 +84,37 @@ export async function callEmailExists(pool, email){
           let highightedlyrics = lyrics.substring(searchIndex, endBoundSearch) + config.highLightEllipses;
           // replace new line with space so it can fit into list element on client side
           if(row){
-            result.push({artistname: row.artistname, songname: row.songname, highlight: highightedlyrics});
+            result.push({artistname: row.artistname, songname: row.songname, highlight: highightedlyrics, url: row.url});
+          }
+        });
+      }
+    }
+    
+    return result;
+  }
+
+
+   //TODO make sure when loading into this table that all lyrics are lowercase.
+   export async function callGetLyrics(pool, userid, url){
+    let result = {}
+
+    const storedProcCall = 'CALL getlyrics(?, ?);';
+
+    let conn = await pool.promise().getConnection();
+    if(conn){
+      const [rows, fields] = 
+      await conn.connection.promise().query(storedProcCall, [userid, url]);
+
+      conn.connection.release();
+      // get just query results from resultset
+      let rowResult = rows[0];
+      if(rowResult){
+        await Object.keys(rowResult).forEach(function(key) {
+
+          let row = rowResult[key];
+         
+          if(row){
+            result = {artistname: row.artistname, songname: row.songname, fulllyrics: row.lyrics};
           }
         });
       }

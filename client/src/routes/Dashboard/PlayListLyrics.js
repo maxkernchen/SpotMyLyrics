@@ -7,16 +7,7 @@ export default class PlayListLyrics extends React.Component {
   constructor() {
     super()
 
-    this.state = {
-      searchTerm: '',
-      searchResults: [],
-      playList: '',
-      existingPlaylists: []
-    };
-
-
   }
-
 
   render() { 
     
