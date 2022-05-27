@@ -21,14 +21,16 @@ await queueJob.clean(0, 'active');
 await queueJob.clean(0, 'completed');
 await queueJob.clean(0, 'delayed');
 await queueJob.clean(0, 'failed');
+await queueJob.obliterate({ force: true })
 
 //TODO best way to handle this?
 //if we use await if another job comes through it waits until it finishes
 // if we don't use it then we won't be able to track if a job is active or not.
 // maybe best thing is to allow user to only create one job at a time.
 // could try concurrency option. 
-queueJob.process(2, async (job) => {
+queueJob.process(2, async (job, done) => {
     await lyricWork(job);
+    done();
 })
 
 export async function scheduleLyricTask(playListID, username) {

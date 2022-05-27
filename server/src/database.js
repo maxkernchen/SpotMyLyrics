@@ -123,7 +123,6 @@ export async function callEmailExists(pool, email){
     return result;
   }
 
-  // get users active playlists and figure out how many songs in the playlist have lyrics
   export async function callGetUserPlaylists(pool, userid){
     let result = [];
 

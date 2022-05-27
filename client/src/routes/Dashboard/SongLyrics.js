@@ -1,6 +1,6 @@
 import React from 'react';
 import { getCurrentUser } from '../../sessionStorage';
-import debounce from 'lodash.debounce';
+import './songlyrics.css';
 const url = require('url');
 
 
@@ -52,7 +52,8 @@ export default class SongLyrics extends React.Component {
     
     return(
         <div>
-            <h1>Lyrics: {this.state.fullSongLyrics.results?.fulllyrics}</h1>
+          <h2 className='lyrics'>{this.state.fullSongLyrics.results?.artistname} - {this.state.fullSongLyrics.results?.songname}</h2>
+            <p className='lyrics' > {this.state.fullSongLyrics.results?.fulllyrics}</p>
         </div>
         
     
