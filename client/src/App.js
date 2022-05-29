@@ -28,8 +28,7 @@ function App() {
         
         
         <BrowserRouter > 
-        <Link to="/spotmylyrics">spot my lyrics
-        
+        <Link to="/spotmylyrics">
         </Link>
           <Switch>
             <Route path="/spotmylyrics">

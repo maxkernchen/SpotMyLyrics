@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 
+
 export default class SMLHome extends React.Component {
 
   
@@ -185,12 +186,14 @@ export default class SMLHome extends React.Component {
     if(searchResults){
       console.log(searchResults);
       let searchLyrics = "/songlyrics?"
- 
-      foundSongsList = searchResults.map((song) =>  <li key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})
-       
-         <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}>Full lyrics</Link>
-      </li>      
-      );
+      if(searchResults.length > 0){
+        foundSongsList = searchResults.map((song) =>  <li key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})
+        <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}>Full lyrics</Link>
+        </li>);
+      }
+      else{
+        foundSongsList = <li key="No Results">No results</li>;
+      }
     }
     if(playlistResults){
         console.log(playlistResults);

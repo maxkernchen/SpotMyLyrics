@@ -114,7 +114,7 @@ export async function callEmailExists(pool, email){
           let row = rowResult[key];
          
           if(row){
-            result = {artistname: row.artistname, songname: row.songname, fulllyrics: row.lyrics};
+            result = {artistname: row.artistname, songname: row.songname, fulllyrics: row.lyrics, albumarturl : row.albumart};
           }
         });
       }

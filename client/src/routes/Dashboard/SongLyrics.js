@@ -1,7 +1,21 @@
 import React from 'react';
 import { getCurrentUser } from '../../sessionStorage';
 import './songlyrics.css';
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem } from 'reactstrap';
 const url = require('url');
+
+
 
 
 export default class SongLyrics extends React.Component {
@@ -10,9 +24,18 @@ export default class SongLyrics extends React.Component {
 
     this.state = {
       fullSongLyrics: {},
+      isOpen: false
+      
     };
-
+    this.toggle = this.toggle.bind(this);
+  
   }
+  toggle() {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
+  }
+
 
   async getLyricsForUrlRequest(url){
 
@@ -51,12 +74,32 @@ export default class SongLyrics extends React.Component {
    
     
     return(
-        <div>
-          <h2 className='lyrics'>{this.state.fullSongLyrics.results?.artistname} - {this.state.fullSongLyrics.results?.songname}</h2>
-            <p className='lyrics' > {this.state.fullSongLyrics.results?.fulllyrics}</p>
-        </div>
+
+      
+       <>
+      <div>
+      <Navbar color="light" light expand="md">
+        <NavbarBrand href="/">Spot My Lyrics</NavbarBrand>
+        <NavbarToggler onClick={this.toggle} />
+        <Collapse isOpen={this.state.isOpen} navbar>
+          <Nav className="ml-auto" navbar>
+            <NavItem>
+              <NavLink href="/spotmylyrics/">Home</NavLink>
+            </NavItem>
+          </Nav>
+        </Collapse>
+      </Navbar>
+    </div>
+      <img className='album_art' src={this.state.fullSongLyrics.results?.albumarturl}></img>
+      <br></br>
+      <h2 className='lyrics'>{this.state.fullSongLyrics.results?.artistname} - {this.state.fullSongLyrics.results?.songname}</h2>
+      <br></br>
+      <p className='lyrics'> {this.state.fullSongLyrics.results?.fulllyrics}</p>
+      
+      </>
         
+      
     
-        )
+        );
     }
 }
