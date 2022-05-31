@@ -193,6 +193,7 @@ export default class SMLHome extends React.Component {
     
     let searchResults = this.state.searchResults?.results;
     let playlistResults = this.state.existingPlaylists?.results;
+    let searchTermLen = this.state?.searchTerm.length;
     let foundSongsList;
     let existingPlayListList;
 
@@ -203,8 +204,9 @@ export default class SMLHome extends React.Component {
      
       if(searchResults.length > 0){
         
-        foundSongsList = searchResults.map((song) =>  <ListGroupItem key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})
-        <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}>Full lyrics</Link>
+        foundSongsList = searchResults.map((song) =>  <ListGroupItem key={song.songname}>{song.songname} - {song.artistname} 
+        (<mark>{song.highlight.substring(0,searchTermLen)}</mark>{song.highlight.substring(searchTermLen, song.highlight.length + 1)}) - 
+        <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}> Full lyrics</Link>
         </ListGroupItem>);
       }
       else{
@@ -222,7 +224,7 @@ export default class SMLHome extends React.Component {
     }
     
     return(
-      
+      <>
     <div className="home_center">
       <h1>View Playlists: </h1>
       <Button onClick={this.getExistPlayListOnClick}>View Playlists</Button>
@@ -241,11 +243,13 @@ export default class SMLHome extends React.Component {
             <p>Search!</p>
             <input type="text" onChange={this.handleInputChangeLyricSearch}/>
         </label>
-        <ListGroup>
+      </div>
+      <div>
+        <ListGroup flush className="lyric_list">
         {foundSongsList}
         </ListGroup>
-    </div>
-
+        </div>
+    </>
     
   );
   }
