@@ -1,7 +1,7 @@
 import React , { useState } from "react"
 import logo from './logo.svg';
 import './app.css';
-import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
 import Preferences from './routes/Preferences/Preferences';
 import Login from './routes/Login/Login';
 import {useToken, useUserID} from "./sessionStorage";
@@ -21,15 +21,12 @@ function App() {
     return <Login setToken={setToken} setUserID={setUserID} />
   }
   else{
- 
+  
     return (
+      
       <div className="wrapper">
- 
-        
-        
-        <BrowserRouter > 
-        <Link to="/spotmylyrics">
-        </Link>
+     
+        <BrowserRouter>
           <Switch>
             <Route path="/spotmylyrics">
               <SMLHome />
@@ -43,9 +40,11 @@ function App() {
             <Route path="/songlyrics">
               <SongLyrics />
             </Route>
+            <Redirect from="/" to="/spotmylyrics" />
           </Switch>
         </BrowserRouter>
       </div>
+      
     );
 
   }

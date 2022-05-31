@@ -4,6 +4,20 @@ import debounce from 'lodash.debounce';
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './smlhome.css';
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
 
 
 
@@ -186,13 +200,15 @@ export default class SMLHome extends React.Component {
     if(searchResults){
       console.log(searchResults);
       let searchLyrics = "/songlyrics?"
+     
       if(searchResults.length > 0){
-        foundSongsList = searchResults.map((song) =>  <li key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})
+        
+        foundSongsList = searchResults.map((song) =>  <ListGroupItem key={song.songname}>{song.songname} - {song.artistname} ({song.highlight})
         <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}>Full lyrics</Link>
-        </li>);
+        </ListGroupItem>);
       }
       else{
-        foundSongsList = <li key="No Results">No results</li>;
+        foundSongsList = <ListGroupItem key="no results">No results</ListGroupItem>;
       }
     }
     if(playlistResults){
@@ -207,9 +223,9 @@ export default class SMLHome extends React.Component {
     
     return(
       
-    <div>
+    <div className="home_center">
       <h1>View Playlists: </h1>
-      <button onClick={this.getExistPlayListOnClick}>View Playlists</button>
+      <Button onClick={this.getExistPlayListOnClick}>View Playlists</Button>
       {existingPlayListList}
       <br></br>
 
@@ -218,15 +234,16 @@ export default class SMLHome extends React.Component {
         <input type="text" onChange={e => this.setState({
         playList: e.target.value
         })}/>
-        <button type="submit">Add Playlist</button>
+        <Button color="success" type="submit">Add Playlist</Button>
       </form>
       <h2>Search Lyrics!</h2>
       <label>
             <p>Search!</p>
             <input type="text" onChange={this.handleInputChangeLyricSearch}/>
         </label>
-        
+        <ListGroup>
         {foundSongsList}
+        </ListGroup>
     </div>
 
     
