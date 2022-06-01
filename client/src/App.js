@@ -3,8 +3,7 @@ import logo from './logo.svg';
 import './app.css';
 import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
 import Preferences from './routes/Preferences/Preferences';
-import Login from './routes/Login/Login';
-import {useToken, useUserID, getToken, saveToken} from "./sessionStorage";
+import {useToken, useUserID, getToken, saveToken, saveUserID, getCurrentUser} from "./sessionStorage";
 import SMLHome from "./routes/Dashboard/SMLHome";
 import PlayListLyrics from "./routes/Dashboard/PlayListLyrics"
 import SongLyrics from "./routes/Dashboard/SongLyrics";
@@ -43,25 +42,23 @@ const uiConfig = {
     
   ],
    callbacks: {
-    signInSuccessWithAuthResult:  async (authResult, redirectUrl) => {
+    signInSuccessWithAuthResult: async (authResult, redirectUrl) => {
       const { user } = authResult;
-      saveToken(await user.getIdToken())
-      
+  
+      // TODO fail auth if user exists in firebase but not in local db??
+      await saveToken(user.accessToken);
+      login(user.accessToken, user.email);
+      console.log('done');
     }
   }
 
 }
 
-
-
 function App() {
   
- 
   let token = getToken();
-
   if(!token) {
       return (<div>
-      <h1>My App</h1>
       <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
     </div>);
@@ -96,6 +93,42 @@ function App() {
 
   }
   
+}
+
+async function loginUser(credentials) {
+
+  const payload = JSON.stringify(credentials);
+  return fetch('http://localhost:3001/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: payload
+  })
+    .then(data =>  data.json())
+    .catch((error) => {
+      console.log(error)
+    });
+ }
+
+
+async function login(tokenFromUser, email) {
+
+let result;
+try{
+   result = await loginUser({
+    useremail: email
+  });
+}
+catch(e){
+  console.log("failure" + e);
+}
+  if(result.userid){
+    saveToken(tokenFromUser);
+    saveUserID(result.userid);
+  }
+  
+ 
 }
 
 

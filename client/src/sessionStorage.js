@@ -21,14 +21,16 @@ export function useToken() {
       
   }
 
+  //TODO token needs to be verified against firebase
   export function getToken(){
     const tokenSession = sessionStorage.getItem('token');
     const userToken = JSON.parse(tokenSession);
     return userToken;
 
   }
-  export function saveToken(userToken)
+  export async function saveToken(userToken)
   {
+    console.log('saved token');
     sessionStorage.setItem('token', JSON.stringify(userToken));
   }
 
@@ -54,10 +56,16 @@ export function useToken() {
 
 
   // TODO might be possible to replace with firebase call.
+  // will need to to do this else user can simply edit session table to get access to other user's data
   export function getCurrentUser(){
     const useridSession = sessionStorage.getItem('userid');
     const useridJson = JSON.parse(useridSession);
     return useridJson;
 
+  }
+
+  export function saveUserID(userid){
+    sessionStorage.setItem('userid', JSON.stringify(userid));
+   
   }
 

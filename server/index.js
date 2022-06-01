@@ -28,28 +28,29 @@ export function getConnectionPool() {
   return pool;
 }
 
+// modified to just pass in the username not the password. 
+// Authentication is all done on the client side now, this will just  map the email to the username
 app.post('/login', async function(req, res) {
  
-  // first check if the email exists in the db.
-  if(await callEmailExists(pool, req.body.username)){
-    let tokenResult;
-    try{
-    // login with email/pass into firebase
-    tokenResult = await firebaseLogin(req.body.username,req.body.password);
-    }
-    catch{
-     res.send({token:'', userid: 'failed login'});
-    }
-    if(tokenResult){
+  if(await callEmailExists(pool, req.body.useremail)){
+      console.log('logged in!');
+      let useridfromdb = await callGetUserIdFromEmail(pool, req.body.useremail);
+      console.log('logged in!' + useridfromdb);
+      try{
       res.send({
-        token: tokenResult,
-        userid: await callGetUserIdFromEmail(pool, req.body.username)
+        userid: useridfromdb
+       }); 
+      }
+       catch(e){
+         console.log("exception from login " + e);
+       }
+    }
+    else{
+      res.send({
+        userid: ''
        }); 
     }
   
-  }
-
- 
   
 });
 
