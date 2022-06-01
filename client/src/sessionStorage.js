@@ -21,6 +21,17 @@ export function useToken() {
       
   }
 
+  export function getToken(){
+    const tokenSession = sessionStorage.getItem('token');
+    const userToken = JSON.parse(tokenSession);
+    return userToken;
+
+  }
+  export function saveToken(userToken)
+  {
+    sessionStorage.setItem('token', JSON.stringify(userToken));
+  }
+
   //TODO can either use firebase ccurrent user or just store it as global var.
   // do this to be safer than having it in the session table. Also we should
   // check if the user is defined in its var rather than if the token exists.
@@ -49,3 +60,4 @@ export function useToken() {
     return useridJson;
 
   }
+

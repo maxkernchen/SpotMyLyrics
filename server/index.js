@@ -38,7 +38,7 @@ app.post('/login', async function(req, res) {
     tokenResult = await firebaseLogin(req.body.username,req.body.password);
     }
     catch{
-      console.log("bad login");
+     res.send({token:'', userid: 'failed login'});
     }
     if(tokenResult){
       res.send({

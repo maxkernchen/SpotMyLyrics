@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './login.css';
 
 
+
+
 async function loginUser(credentials) {
 
     const payload = JSON.stringify(credentials);
@@ -20,6 +22,7 @@ export default function Login({ setToken, setUserID }) {
 
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
+  const [firstLogin, setFirstLogin] = useState(true);
 
 
 
@@ -32,9 +35,12 @@ export default function Login({ setToken, setUserID }) {
     
     setToken(result.token);
     setUserID(result.userid);
-    
-  }
+    if(!result.token && firstLogin){
+      setFirstLogin(false);
 
+    }
+  }
+  if(firstLogin){
   return(
     <div className="login-wrapper">
     <h1>Please Log In</h1>
@@ -53,6 +59,28 @@ export default function Login({ setToken, setUserID }) {
         </form>
     </div>
   )
+  }
+  else{
+    return(
+    <div className="login-wrapper">
+    <h1>Please Log In</h1>
+        <form onSubmit={handleSubmit}> 
+        <label>
+            <p>Username</p>
+            <input type="text" onChange={e => setUserName(e.target.value)}/>
+        </label>
+        <label>
+            <p>Password</p>
+            <input type="password" onChange={e => setPassword(e.target.value)}/>
+        </label>
+        <h1>Failed login</h1>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+        </form>
+    </div>
+    )
+  }
 }
 
 
