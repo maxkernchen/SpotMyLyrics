@@ -3,11 +3,11 @@ import cors from "cors";
 import path from "express";
 import mysql from "mysql2";
 import mysqlPromsie from "mysql2/promise";
-import firebaseLogin from "./src/auth.js";
 import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, 
   callGetUserPlaylists, callGetLyrics} from "./src/database.js";
 import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
+
 
 
 const app = express();
@@ -114,6 +114,17 @@ export function updatePlayListProgress(progressData){
 }
 
 app.get('/playlistprogress', progessHandler);
+
+
+app.get('/setcookie', (req, res) => {
+  res.cookie(`Cookie token name`,`encrypted cookie string Value`,{
+      maxAge: 60*60*24,
+      secure: true,
+      httpOnly: true,
+      sameSite: 'lax'
+  });
+  res.send('Cookie have been saved successfully');
+});
   
 
 app.listen(PORT, () => {

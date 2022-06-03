@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, } from "firebase/auth";
+import * as firebaseAdmin from "firebase-admin";
 import {config} from "./config/config.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -33,18 +33,25 @@ var currentUser;
   }
 }); */
 
-export default async function firebaseLogin(email, password){
+const authFireBasetoken = async (req, res, next) => {
+  const header = req.headers.authorization;
 
-  let result; 
-  let userCredential;
- // userCredential =  await signInWithEmailAndPassword(auth, email, password);
-  if(userCredential){
-    const user = userCredential.user;
-    result = await user.getIdToken();
+  if (header) {
+    const idToken = authHeader.split(" ")[1];
+    firebaseAdmin
+      .auth()
+      .verifyIdToken(idToken)
+      .then(function (decodedToken) {
+        return next();
+      })
+      .catch(function (error) {
+        console.log(error);
+        return res.sendStatus(403);
+      });
+  } else {
+    res.sendStatus(401);
   }
-  
-  return result;
-}
+};
 
 
 

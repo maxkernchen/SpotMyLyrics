@@ -18,16 +18,18 @@ import {
   DropdownMenu,
   DropdownItem,
   Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
+import { CurrentUserContext } from "../../CurrentUserContext";
 
 
 
 
 export default class SMLHome extends React.Component {
-
   
   constructor() {
     super()
     toast.configure();
+
+    
 
     this.state = {
       searchTerm: '',
@@ -198,6 +200,8 @@ export default class SMLHome extends React.Component {
     let existingPlayListList;
 
 
+    console.log(this.context);
+
     if(searchResults){
       console.log(searchResults);
       let searchLyrics = "/songlyrics?"
@@ -254,3 +258,5 @@ export default class SMLHome extends React.Component {
   );
   }
 }
+
+SMLHome.contextType = CurrentUserContext;

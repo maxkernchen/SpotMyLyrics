@@ -1,4 +1,4 @@
-import React , { useState } from "react"
+import React , { useEffect,useState } from "react"
 import logo from './logo.svg';
 import './app.css';
 import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
@@ -11,6 +11,7 @@ import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, } from "firebase/auth";
+import { CurrentUserContext, useAuth } from "./CurrentUserContext";
 
 import 'firebase/compat/auth';
 
@@ -26,6 +27,7 @@ const firebaseConfig = {
 };
 
 
+
 firebase.initializeApp(firebaseConfig);
 let auth = getAuth();
 
@@ -37,27 +39,43 @@ const uiConfig = {
   signInSuccessUrl: '/spotmylyrics',
   // We will display Google and Facebook as auth providers.
   signInOptions: [
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
     
-  ],
-   callbacks: {
-    signInSuccessWithAuthResult: async (authResult, redirectUrl) => {
-      const { user } = authResult;
-  
-      // TODO fail auth if user exists in firebase but not in local db??
-      await saveToken(user.accessToken);
-      login(user.accessToken, user.email);
-      console.log('done');
-    }
-  }
+  ]
 
 }
 
 function App() {
+
+  const [context, setContext] = useState();
+  const [loading, setLoading] = useState(true);
+
+
+    useEffect(()=>{
+      const unsub = onAuthStateChanged(getAuth(),user=>{
+        if (user) {
+          console.log("signed in")
+          setContext(user);
+          }
+          else {
+          console.log("signed out")
+          }
+          console.log("Auth state changed");
+          setLoading(false);
+      })
+      
+      return unsub;
+  },[])
+
+ if(loading){
   
-  let token = getToken();
-  if(!token) {
+    return(
+    <div>
+      <h1>Loading...</h1>
+    </div>);
+  
+ }
+else if(!context) {
       return (<div>
       <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
@@ -65,11 +83,10 @@ function App() {
 
   }
   else{
-  
+
     return (
-      
-      <div className="wrapper">
-     
+      <div>
+        <CurrentUserContext.Provider value={context}>
         <BrowserRouter>
           <Switch>
             <Route path="/spotmylyrics">
@@ -87,49 +104,16 @@ function App() {
             <Redirect from="/" to="/spotmylyrics" />
           </Switch>
         </BrowserRouter>
+        </CurrentUserContext.Provider>
       </div>
       
     );
 
   }
   
-}
-
-async function loginUser(credentials) {
-
-  const payload = JSON.stringify(credentials);
-  return fetch('http://localhost:3001/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: payload
-  })
-    .then(data =>  data.json())
-    .catch((error) => {
-      console.log(error)
-    });
- }
-
-
-async function login(tokenFromUser, email) {
-
-let result;
-try{
-   result = await loginUser({
-    useremail: email
-  });
-}
-catch(e){
-  console.log("failure" + e);
-}
-  if(result.userid){
-    saveToken(tokenFromUser);
-    saveUserID(result.userid);
-  }
   
- 
 }
+
 
 
 export default App;

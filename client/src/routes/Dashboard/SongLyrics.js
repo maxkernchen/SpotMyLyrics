@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { getCurrentUser } from '../../sessionStorage';
 import './songlyrics.css';
 import {
@@ -13,9 +13,15 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem } from 'reactstrap';
+import { CurrentUserContext } from '../../CurrentUserContext';
+
 const url = require('url');
 
+function GetCurrentContext(){
 
+  const [context, setContext] = useContext(CurrentUserContext);
+  return context;
+}
 
 
 export default class SongLyrics extends React.Component {
@@ -34,6 +40,8 @@ export default class SongLyrics extends React.Component {
     this.setState({
       isOpen: !this.state.isOpen
     });
+
+    
   }
 
 
@@ -60,7 +68,7 @@ export default class SongLyrics extends React.Component {
     })
 
   }
-
+  
   
 
    render() { 
@@ -71,7 +79,6 @@ export default class SongLyrics extends React.Component {
     if(!lyricsExist){
       this.getLyricsFromUrl(lyricPayload.url);
     }
-   
     
     return(
 
