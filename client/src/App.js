@@ -3,7 +3,6 @@ import logo from './logo.svg';
 import './app.css';
 import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
 import Preferences from './routes/Preferences/Preferences';
-import {useToken, useUserID, getToken, saveToken, saveUserID, getCurrentUser} from "./sessionStorage";
 import SMLHome from "./routes/Dashboard/SMLHome";
 import PlayListLyrics from "./routes/Dashboard/PlayListLyrics"
 import SongLyrics from "./routes/Dashboard/SongLyrics";
@@ -11,7 +10,7 @@ import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, } from "firebase/auth";
-import { CurrentUserContext, useAuth } from "./CurrentUserContext";
+import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
 
 import 'firebase/compat/auth';
 
@@ -55,17 +54,23 @@ function App() {
       const unsub = onAuthStateChanged(getAuth(),user=>{
         if (user) {
           console.log("signed in")
-          setContext(user);
+          auth.currentUser.getIdToken(true).then(function(idToken) {
+              let useridfromemail = verifyUserAndEmail(idToken, user.email);
+              useridfromemail.then(data =>
+                  setContext({firebaseuser: user, userid: data.userid}));
+                  setLoading(false);
+              })
           }
           else {
           console.log("signed out")
+          setLoading(false);
           }
           console.log("Auth state changed");
-          setLoading(false);
+          
       })
       
       return unsub;
-  },[])
+  },[!loading])
 
  if(loading){
   
@@ -75,7 +80,7 @@ function App() {
     </div>);
   
  }
-else if(!context) {
+else if(!context?.userid) {
       return (<div>
       <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />

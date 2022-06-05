@@ -2,11 +2,12 @@ import express from "express";
 import cors from "cors";
 import path from "express";
 import mysql from "mysql2";
-import mysqlPromsie from "mysql2/promise";
 import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, 
   callGetUserPlaylists, callGetLyrics} from "./src/database.js";
 import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
+import { verifyUserToken } from "./src/auth.js";
+
 
 
 
@@ -28,31 +29,31 @@ export function getConnectionPool() {
   return pool;
 }
 
-// modified to just pass in the username not the password. 
-// Authentication is all done on the client side now, this will just  map the email to the username
-app.post('/login', async function(req, res) {
+
+app.post('/verifyuser', async function(req, res) {
  
   if(await callEmailExists(pool, req.body.useremail)){
-      console.log('logged in!');
       let useridfromdb = await callGetUserIdFromEmail(pool, req.body.useremail);
-      console.log('logged in!' + useridfromdb);
-      try{
-      res.send({
-        userid: useridfromdb
-       }); 
+      
+      if(await verifyUserToken(req.body.usertoken)){
+        res.send({
+          userid: useridfromdb
+        }); 
       }
-       catch(e){
-         console.log("exception from login " + e);
-       }
+      else{
+        res.send({
+          userid: 'invalid token'
+         }); 
+      }
     }
     else{
       res.send({
-        userid: ''
+        userid: 'invalid email'
        }); 
     }
-  
-  
 });
+
+
 
 app.post("/lyricsearch", async function(req, res){
     let resultsLyricSearch = await callGetLyricsForUser(pool, req.body.username, req.body.searchterm)

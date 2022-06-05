@@ -1,44 +1,21 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import * as firebaseAdmin from "firebase-admin";
-import {config} from "./config/config.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeApp, cert, } from "firebase-admin/app";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: config.firebaseApiKey,
-  authDomain: config.firebaseAuthDomain,
-  projectId: config.firebaseProjectID,
-  storageBucket: config.firebaseStorageBucktet,
-  messagingSenderId: config.firebaseMsgSenderID,
-  appId: config.firebaseAppID,
-  measurementId: config.firebaseMeasureID
-};
+import {getAuth} from "firebase-admin/auth"
 
-// Initialize Firebase
-//const app = initializeApp(firebaseConfig);
-//const auth = getAuth();
-var currentUser;
+import serviceAccount from "/home/max/Documents/Projects/firebasePK/firebaseSMLAccountKey.json" assert { type: 'json' };
 
-/* onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log('current user is ' + user.email);
-    const uid = user.uid;
-    // ...
-  } else {
-    // User is signed out
-    // ...
-  }
-}); */
+const app = initializeApp({
+  credential: cert(serviceAccount)
+});
 
-const authFireBasetoken = async (req, res, next) => {
+
+
+export const authFireBaseTokenMiddleware = async (req, res, next) => {
   const header = req.headers.authorization;
 
   if (header) {
-    const idToken = authHeader.split(" ")[1];
-    firebaseAdmin
+    const idToken = authHeader.split("|")[1];
+    admin
       .auth()
       .verifyIdToken(idToken)
       .then(function (decodedToken) {
@@ -52,6 +29,25 @@ const authFireBasetoken = async (req, res, next) => {
     res.sendStatus(401);
   }
 };
+
+export const verifyUserToken = async (idToken) =>{
+
+  if(idToken){
+    getAuth()
+      .verifyIdToken(idToken)
+      .then(function (decodedToken) {
+        return true;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return false;
+      });
+  }
+  else{
+    return false;
+  }
+
+} 
 
 
 
