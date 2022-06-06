@@ -1,5 +1,4 @@
 import React from "react";
-import { getCurrentUser } from '../../sessionStorage';
 import debounce from 'lodash.debounce';
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -57,6 +56,8 @@ export default class SMLHome extends React.Component {
     this.searchLyricsDebounced();
     
   }
+
+  
 
   async searchLyricsDebounceCall(){
     let results = await this.searchLyrics(this.state.searchTerm);
@@ -144,9 +145,11 @@ export default class SMLHome extends React.Component {
   }
 
 
+
+
   async searchLyrics(searchTermStr){
     if(searchTermStr && searchTermStr.trim().length){
-      const payload = JSON.stringify({searchterm: searchTermStr.toLowerCase().trim(), username: getCurrentUser()});
+      const payload = JSON.stringify({searchterm: searchTermStr.toLowerCase().trim(), username: this.context?.userid});
       return fetch('http://localhost:3001/lyricsearch', {
         method: 'POST',
         headers: {
@@ -159,7 +162,7 @@ export default class SMLHome extends React.Component {
   }
 
   async getExistingPlaylists(){
-      const payload = JSON.stringify({username: getCurrentUser()});
+      const payload = JSON.stringify({username: this.context?.userid});
       return fetch('http://localhost:3001/userplaylists', {
         method: 'POST',
         headers: {
@@ -175,7 +178,7 @@ export default class SMLHome extends React.Component {
   async addPlayList(playListIDStr){
 
       if(playListIDStr && playListIDStr.trim().length){
-        const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: getCurrentUser()});
+        const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: this.context?.userid});
         return fetch('http://localhost:3001/addplaylist', {
           method: 'POST',
           headers: {

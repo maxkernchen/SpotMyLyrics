@@ -11,6 +11,9 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, } from "firebase/auth";
 import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+
 
 import 'firebase/compat/auth';
 
@@ -54,12 +57,11 @@ function App() {
       const unsub = onAuthStateChanged(getAuth(),user=>{
         if (user) {
           console.log("signed in")
-          auth.currentUser.getIdToken(true).then(function(idToken) {
-              let useridfromemail = verifyUserAndEmail(idToken, user.email);
-              useridfromemail.then(data =>
-                  setContext({firebaseuser: user, userid: data.userid}));
-                  setLoading(false);
-              })
+          auth.currentUser.getIdToken(true).then(async function(idToken) {
+              let useridfromemail = await verifyUserAndEmail(idToken, user.email);
+              setContext({firebaseuser: user, userid: useridfromemail.userid});
+              setLoading(false);
+            })
           }
           else {
           console.log("signed out")
@@ -70,7 +72,7 @@ function App() {
       })
       
       return unsub;
-  },[!loading])
+  },[])
 
  if(loading){
   
@@ -91,6 +93,7 @@ else if(!context?.userid) {
 
     return (
       <div>
+        <FontAwesomeIcon icon="fa-solid fa-arrow-right-from-bracket" />
         <CurrentUserContext.Provider value={context}>
         <BrowserRouter>
           <Switch>

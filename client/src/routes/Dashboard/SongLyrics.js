@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { getCurrentUser } from '../../sessionStorage';
+
 import './songlyrics.css';
 import {
   Collapse,
@@ -17,11 +17,7 @@ import { CurrentUserContext } from '../../CurrentUserContext';
 
 const url = require('url');
 
-function GetCurrentContext(){
 
-  const [context, setContext] = useContext(CurrentUserContext);
-  return context;
-}
 
 
 export default class SongLyrics extends React.Component {
@@ -48,7 +44,7 @@ export default class SongLyrics extends React.Component {
   async getLyricsForUrlRequest(url){
 
     if(url && url.trim().length){
-      const payload = JSON.stringify({songurl: url, username: getCurrentUser()});
+      const payload = JSON.stringify({songurl: url, username: this.context?.userid});
       return fetch('http://localhost:3001/getlyrics', {
         method: 'POST',
         headers: {
@@ -110,3 +106,5 @@ export default class SongLyrics extends React.Component {
         );
     }
 }
+
+SongLyrics.contextType = CurrentUserContext;

@@ -9,7 +9,6 @@ const app = initializeApp({
 });
 
 
-
 export const authFireBaseTokenMiddleware = async (req, res, next) => {
   const header = req.headers.authorization;
 
@@ -33,20 +32,18 @@ export const authFireBaseTokenMiddleware = async (req, res, next) => {
 export const verifyUserToken = async (idToken) =>{
 
   if(idToken){
-    getAuth()
-      .verifyIdToken(idToken)
-      .then(function (decodedToken) {
-        return true;
-      })
-      .catch(function (error) {
+    try{
+    let decodedToken = await getAuth().verifyIdToken(idToken);
+    if(decodedToken)
+      return true;
+    }
+    catch(error) {
         console.log(error);
         return false;
-      });
+      }
   }
-  else{
-    return false;
-  }
-
+  return false;
+  
 } 
 
 
