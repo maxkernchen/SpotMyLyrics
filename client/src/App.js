@@ -10,13 +10,27 @@ import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, } from "firebase/auth";
+import 'firebase/compat/auth';
 import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import fontawesome from '@fortawesome/fontawesome';
 import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem } from 'reactstrap';
 
 
-import 'firebase/compat/auth';
 
+fontawesome.library.add(faArrowRightFromBracket);
 
 const firebaseConfig = {
   apiKey: config.firebaseApiKey,
@@ -51,6 +65,7 @@ function App() {
 
   const [context, setContext] = useState();
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen]   = useState(false);
 
 
     useEffect(()=>{
@@ -93,8 +108,19 @@ else if(!context?.userid) {
 
     return (
       <div>
-        <FontAwesomeIcon icon="fa-solid fa-arrow-right-from-bracket" />
+       
         <CurrentUserContext.Provider value={context}>
+        <Navbar color="light" light expand="md">
+        <NavbarBrand href="/">Spot My Lyrics</NavbarBrand>
+        <NavbarToggler onClick={()=>setIsOpen(!isOpen)} />
+        <Collapse isOpen={isOpen} navbar>
+          <Nav className="ml-auto" navbar>
+            <NavItem>
+              <NavLink href="/spotmylyrics/">Home  <FontAwesomeIcon icon="fa-solid fa-arrow-right-from-bracket" size="2x"/></NavLink>
+            </NavItem>
+          </Nav>
+        </Collapse>
+      </Navbar>
         <BrowserRouter>
           <Switch>
             <Route path="/spotmylyrics">
