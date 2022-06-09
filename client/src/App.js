@@ -9,7 +9,7 @@ import SongLyrics from "./routes/Dashboard/SongLyrics";
 import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, signOut } from "firebase/auth";
 import 'firebase/compat/auth';
 import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -23,10 +23,11 @@ import {
   Nav,
   NavItem,
   NavLink,
-  UncontrolledDropdown,
+  Tooltip,
   DropdownToggle,
   DropdownMenu,
   DropdownItem } from 'reactstrap';
+  import ReactTooltip from "react-tooltip";
 
 
 
@@ -60,6 +61,13 @@ const uiConfig = {
   ]
 
 }
+function signOutFireBase(){
+  signOut(auth).then(() => {
+    // Sign-out successful.
+  }).catch((error) => {
+    // An error happened.
+  });
+}
 
 function App() {
 
@@ -70,6 +78,7 @@ function App() {
 
     useEffect(()=>{
       const unsub = onAuthStateChanged(getAuth(),user=>{
+        setLoading(true);
         if (user) {
           console.log("signed in")
           auth.currentUser.getIdToken(true).then(async function(idToken) {
@@ -114,9 +123,20 @@ else if(!context?.userid) {
         <NavbarBrand href="/">Spot My Lyrics</NavbarBrand>
         <NavbarToggler onClick={()=>setIsOpen(!isOpen)} />
         <Collapse isOpen={isOpen} navbar>
-          <Nav className="ml-auto" navbar>
+          <Nav className="ms-auto" navbar>
             <NavItem>
-              <NavLink href="/spotmylyrics/">Home  <FontAwesomeIcon icon="fa-solid fa-arrow-right-from-bracket" size="2x"/></NavLink>
+              <NavLink href="/" onClick={()=>
+                { 
+                   signOutFireBase();
+                  
+                  }}> 
+                <FontAwesomeIcon data-tip data-for="signout-icon" icon="fa-solid fa-arrow-right-from-bracket" size="2x">
+                 
+                </FontAwesomeIcon>
+                <ReactTooltip id="signout-icon" place="bottom" effect="solid">
+                Sign Out
+              </ReactTooltip>
+              </NavLink>
             </NavItem>
           </Nav>
         </Collapse>
@@ -139,6 +159,8 @@ else if(!context?.userid) {
           </Switch>
         </BrowserRouter>
         </CurrentUserContext.Provider>
+
+        
       </div>
       
     );
