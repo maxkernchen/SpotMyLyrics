@@ -4,7 +4,7 @@ import './app.css';
 import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
 import Preferences from './routes/Preferences/Preferences';
 import SMLHome from "./routes/Dashboard/SMLHome";
-import PlayListLyrics from "./routes/Dashboard/PlayListLyrics"
+import PlayLists from "./routes/Dashboard/PlayLists"
 import SongLyrics from "./routes/Dashboard/SongLyrics";
 import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
@@ -14,7 +14,7 @@ import 'firebase/compat/auth';
 import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
-import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faRotate } from '@fortawesome/free-solid-svg-icons'
 import {
   Collapse,
   Navbar,
@@ -31,7 +31,7 @@ import {
 
 
 
-fontawesome.library.add(faArrowRightFromBracket);
+fontawesome.library.add(faArrowRightFromBracket, faRotate);
 
 const firebaseConfig = {
   apiKey: config.firebaseApiKey,
@@ -101,8 +101,8 @@ function App() {
  if(loading){
   
     return(
-    <div>
-      <h1>Loading...</h1>
+    <div className="loading-div">
+    <FontAwesomeIcon className="centered" icon="fa-solid fa-rotate" size="5x" spin={true}/>
     </div>);
   
  }
@@ -123,6 +123,16 @@ else if(!context?.userid) {
         <NavbarBrand href="/">Spot My Lyrics</NavbarBrand>
         <NavbarToggler onClick={()=>setIsOpen(!isOpen)} />
         <Collapse isOpen={isOpen} navbar>
+        <Nav className="ml-auto" navbar>
+            <NavItem>
+              <NavLink href="/playlists" data-tip data-for="playlists-link">
+                 Play Lists
+                <ReactTooltip id="playlists-link" place="bottom" effect="solid">
+                View Synced Playlists 
+              </ReactTooltip>
+              </NavLink>
+            </NavItem>
+          </Nav>
           <Nav className="ms-auto" navbar>
             <NavItem>
               <NavLink href="/" onClick={()=>
@@ -149,8 +159,8 @@ else if(!context?.userid) {
             <Route path="/preferences">
               <Preferences />
             </Route>
-            <Route path="/playlistlyrics">
-              <PlayListLyrics />
+            <Route path="/playlists">
+              <PlayLists />
             </Route>
             <Route path="/songlyrics">
               <SongLyrics />

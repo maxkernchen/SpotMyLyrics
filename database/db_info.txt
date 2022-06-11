@@ -94,6 +94,16 @@ CREATE PROCEDURE getuserplaylist(IN userid VARCHAR(50))
          AND p.playlistid = mp.playlistid;
          
        END//
+       
+       
+CREATE PROCEDURE getallusersongs(IN userid VARCHAR(50))
+	BEGIN
+	SELECT distinct p.playlistid, sul.* FROM spotmylyricsdb.smlplaylist p
+	JOIN spotmylyricsdb.smlusersongmapping mp ON mp.userid = userid
+	AND p.playlistid = mp.playlistid
+	JOIN spotmylyricsdb.smluserlyrics sul ON sul.url = mp.url;
+
+END//
 
 CREATE PROCEDURE insertlryicsforuserplaylist(IN url varchar(200), IN songname varchar(200), IN artistname varchar(200), IN albumart varchar(200), IN lyrics text, IN lyricsfound TINYINT, IN userid varchar(50), IN playlistid varchar(200))
        BEGIN

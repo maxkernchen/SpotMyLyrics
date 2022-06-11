@@ -3,7 +3,7 @@ import cors from "cors";
 import path from "express";
 import mysql from "mysql2";
 import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, 
-  callGetUserPlaylists, callGetLyrics} from "./src/database.js";
+  callGetUserPlaylists, callGetLyrics, callGetAllUserSongs} from "./src/database.js";
 import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
 import { verifyUserToken } from "./src/auth.js";
@@ -77,6 +77,13 @@ app.post("/userplaylists", async function(req, res){
   res.send({results: resultsUserPlaylist});
   
 });
+
+app.post("/allusersongs", async function(req, res){
+  let resultsAllUserSongs = await callGetAllUserSongs(pool, req.body.username);
+  res.send({results: resultsAllUserSongs});
+  
+});
+
 
 
 

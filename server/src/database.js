@@ -141,8 +141,36 @@ export async function callEmailExists(pool, email){
 
           let row = rowResult[key];
           if(row){
-            result.push({playlistname: row.playlistname, songswithlyrics: row.songswithlyrics, 
+            result.push({playlistname: row.playlistname, playlistid: row.playlistid, songswithlyrics: row.songswithlyrics, 
               songswithoutlyrics: row.songswithoutlyrics, lastsynced: row.lastsynced});
+          }
+        });
+      }
+    }
+    
+    return result;
+  }
+
+  export async function callGetAllUserSongs(pool, userid){
+    let result = [];
+
+    const storedProcCall = 'CALL getallusersongs(?);';
+
+    let conn = await pool.promise().getConnection();
+    if(conn){
+      const [rows, fields] = 
+      await conn.connection.promise().query(storedProcCall, [userid]);
+
+      conn.connection.release();
+      // get just query results from resultset
+      let rowResult = rows[0];
+      if(rowResult){
+        await Object.keys(rowResult).forEach(function(key) {
+
+          let row = rowResult[key];
+          if(row){
+            result.push({playlistid: row.playlistid, songname: row.songname, 
+              artistname: row.artistname, albumarturl: row.albumart, lyricsfound: row.lyricsfound, url: row.url});
           }
         });
       }
