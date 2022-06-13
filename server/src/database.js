@@ -142,7 +142,7 @@ export async function callEmailExists(pool, email){
           let row = rowResult[key];
           if(row){
             result.push({playlistname: row.playlistname, playlistid: row.playlistid, songswithlyrics: row.songswithlyrics, 
-              songswithoutlyrics: row.songswithoutlyrics, lastsynced: row.lastsynced});
+              songswithoutlyrics: row.songswithoutlyrics, lastsynced: row.lastsynced, currentlysyncing: row.issyncing === 1 ? true : false});
           }
         });
       }
@@ -190,12 +190,12 @@ export async function callEmailExists(pool, email){
       }
     }
 
-    export async function callInsertOrUpdateSmlPlaylist(playlistid, playlistname, totalsongs){
-      const storedProcCall = 'CALL insertorupdatesmlplaylist(?, ?, ?);';
+    export async function callInsertOrUpdateSmlPlaylist(playlistid, playlistname, totalsongs, issyncing){
+      const storedProcCall = 'CALL insertorupdatesmlplaylist(?, ?, ?, ?);';
       let conn = await getConnectionPool().promise().getConnection();
       if(conn){
         const [rows, fields] = 
-        await conn.connection.promise().query(storedProcCall, [playlistid, playlistname, totalsongs]);
+        await conn.connection.promise().query(storedProcCall, [playlistid, playlistname, totalsongs, issyncing]);
         conn.connection.release();
         }
       }

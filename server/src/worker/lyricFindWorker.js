@@ -109,7 +109,7 @@ async function lyricWork(job) {
 
 
  
-    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs);
+    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, config.currentlySyncingPlaylist);
     
     for(let i = 0; i < playListTracks.length; i++){
         let track = playListTracks[i];
@@ -137,8 +137,9 @@ async function lyricWork(job) {
         
     }
     console.log('Done!');
-    // update playlist again as we now know songs with and
-    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs);
+    // update playlist again as we now know songs with and without lyrics.
+    //  Also update syncing flag for UI 
+    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, config.doneSyncingPlaylist);
 
     
 }

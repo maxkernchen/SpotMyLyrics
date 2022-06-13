@@ -9,7 +9,7 @@ create table smluserlyrics(url varchar(200) primary key, songname varchar(200), 
 
         
         
-create table smlplaylist(playlistid varchar(200) primary key, playlistname varchar(200), lastsynced datetime, totalsongs int, songswithlyrics int, songswithoutlyrics int);
+create table smlplaylist(playlistid varchar(200) primary key, playlistname varchar(200), lastsynced datetime, totalsongs int, songswithlyrics int, songswithoutlyrics int, issyncing tinyint);
 
 create table smlusersongmapping(userid varchar(50), url varchar(200), playlistid varchar(200),
 index user_idx (userid), index url_idx (url), index playlist_idx (playlistid),
@@ -59,7 +59,7 @@ CREATE PROCEDURE getlyrics(IN userid VARCHAR(50), IN url VARCHAR(1000))
          WHERE smluserlyrics.url = url;
        END//
        
-CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playlistname varchar(200), IN totalsongs INT)
+CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playlistname varchar(200), IN totalsongs INT, IN issyncing tinyint)
        BEGIN
          DECLARE playlistexists TINYINT DEFAULT 0;
          DECLARE songswithoutlyrics INT DEFAULT 0;
@@ -78,11 +78,12 @@ CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playli
          	set smlplaylist.totalsongs = totalsongs,
          	smlplaylist.songswithlyrics = totalsongs - songswithoutlyrics,
          	smlplaylist.songswithoutlyrics = songswithoutlyrics,
-         	smlplaylist.lastsynced = NOW()
+         	smlplaylist.lastsynced = NOW(),
+         	smlplaylist.issyncing = issyncing
          	WHERE smlplaylist.playlistid = playlistid;
          ELSE
          	INSERT INTO spotmylyricsdb.smlplaylist values(playlistid, playlistname, NOW(), 
-         	totalsongs, totalsongs, 0);
+         	totalsongs, totalsongs, 0, issyncing);
          END IF;
          
        END//

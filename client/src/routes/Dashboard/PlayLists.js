@@ -15,10 +15,16 @@ import {
   CardBody,
   UncontrolledCollapse,
   Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
-  import { CurrentUserContext } from "../../CurrentUserContext";
-  import { Link } from 'react-router-dom';
-  import './playlists.css'
-  import update from 'immutability-helper';
+import { CurrentUserContext } from "../../CurrentUserContext";
+import { Link } from 'react-router-dom';
+import './playlists.css'
+import update from 'immutability-helper';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import fontawesome from '@fortawesome/fontawesome';
+import { faSync } from '@fortawesome/free-solid-svg-icons'
+import ReactTooltip from "react-tooltip";
+
+fontawesome.library.add(faSync);
 
 
 
@@ -84,6 +90,26 @@ async getAllUserSongs(){
     .then(data => data.json())
 }
 
+getPlaylistSyncStatus(playlistData){
+
+  if(playlistData.currentlysyncing){
+    return  <>
+      <FontAwesomeIcon color='green' icon="fa-solid fa-rotate" spin={true} >  
+      </FontAwesomeIcon>
+      <ReactTooltip id={playlistData.playlistid} place="bottom" effect="solid">
+          Currently Syncing Playlist
+      </ReactTooltip> 
+    </>
+
+
+
+  }
+  else{
+    return "Last Synced: " + playlistData.lastsynced;
+  }
+
+}
+
 
   render() { 
 
@@ -92,6 +118,7 @@ async getAllUserSongs(){
    let allusersongsresults = this.state.allUserSongs?.results;
    let existingPlayListList;
    let searchLyrics = "/songlyrics?"
+   let syncInfo; 
    if(this.state.callGetPlaylists){
      this.getExistingPlayListsSetState();
      this.getAllUserSongsSetState()
@@ -100,15 +127,16 @@ async getAllUserSongs(){
 
    if(playlistResults && allusersongsresults){
       console.log(playlistResults);
-      existingPlayListList = playlistResults.map((pl) => <Button  className="list-group-item list-group-item-action"
+      
+      existingPlayListList = playlistResults.map((pl) => <Button className="list-group-item list-group-item-action" 
        key={pl.playlistname} onClick={ () =>
         this.setState({
           collapsePlayListCard: update(this.state.collapsePlayListCard, {[pl.playlistid]: {$set: 
             !this.state.collapsePlayListCard.get(pl.playlistid)}})
         })
        
-       }>Name: {pl.playlistname} Songs w/Lyrics: 
-      {pl.songswithlyrics} Songs w/o lyrics: {pl.songswithoutlyrics} Last Synced: {pl.lastsynced} 
+       } data-tip data-for={pl.playlistid}>Name: {pl.playlistname} Songs w/Lyrics: 
+      {pl.songswithlyrics} Songs w/o lyrics: {pl.songswithoutlyrics} {this.getPlaylistSyncStatus.call(this, pl)} 
       
       <Collapse isOpen={this.state.collapsePlayListCard.get(pl.playlistid)}>
         <Card>
