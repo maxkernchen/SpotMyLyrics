@@ -116,7 +116,7 @@ async getAllUserSongs(){
           <ListGroup flush className="playlist-list">
               {allusersongsresults.map((song) => {
 
-                if(song.playlistid == pl.playlistid){
+                if(song.playlistid === pl.playlistid){
                   return <ListGroupItem key={song.songname}>{song.songname}
                     <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}> Full lyrics</Link>
                   </ListGroupItem>
