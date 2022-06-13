@@ -245,13 +245,16 @@ async function getLyricsFromUrl(songUrl, artistName, attempts){
     if(artistMatches){
         let lyricText = $('p.mxm-lyrics__content');
         if(lyricText.length === 0){
-            console.log('Empty Lyrics! '  + songUrl);
+            // set this song as instrumental 
+            lyrics = config.instrumentalSongLyrics;
         }
-        for(let i = 0; i < lyricText.length; i++){
-            // add space at the end of each paragraph to seperate the divs too
-            lyrics += lyricText[i].children[0].children[0].data + ' ';
-            
-        }
+        else{
+            for(let i = 0; i < lyricText.length; i++){
+                // add space at the end of each paragraph to seperate the divs too
+                lyrics += lyricText[i].children[0].children[0].data + ' ';
+                
+            }
+        }   
     }
     else{
         console.log('No Lyrics! ' + songUrl);
