@@ -2,10 +2,9 @@ import React , { useEffect,useState } from "react"
 import logo from './logo.svg';
 import './app.css';
 import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
-import Preferences from './routes/Preferences/Preferences';
-import SMLHome from "./routes/Dashboard/SMLHome";
-import PlayLists from "./routes/Dashboard/PlayLists"
-import SongLyrics from "./routes/Dashboard/SongLyrics";
+import SMLHome from "./routes/SMLHome";
+import PlayLists from "./routes/PlayLists"
+import SongLyrics from "./routes/SongLyrics";
 import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
@@ -155,9 +154,6 @@ else if(!context?.userid) {
           <Switch>
             <Route path="/spotmylyrics">
               <SMLHome />
-            </Route>
-            <Route path="/preferences">
-              <Preferences />
             </Route>
             <Route path="/playlists">
               <PlayLists />

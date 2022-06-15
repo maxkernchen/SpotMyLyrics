@@ -15,7 +15,7 @@ import {
   CardBody,
   UncontrolledCollapse,
   Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
-import { CurrentUserContext } from "../../CurrentUserContext";
+import { CurrentUserContext } from "../CurrentUserContext";
 import { Link } from 'react-router-dom';
 import './playlists.css'
 import update from 'immutability-helper';

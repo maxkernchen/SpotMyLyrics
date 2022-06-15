@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 
 import './songlyrics.css';
 
-import { CurrentUserContext } from '../../CurrentUserContext';
+import { CurrentUserContext } from '../CurrentUserContext';
 
 const url = require('url');
 

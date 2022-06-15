@@ -17,7 +17,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
-import { CurrentUserContext } from "../../CurrentUserContext";
+import { CurrentUserContext } from "../CurrentUserContext";
 
 
 
