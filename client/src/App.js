@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
 import SMLHome from "./routes/SMLHome";
 import PlayLists from "./routes/PlayLists"
 import SongLyrics from "./routes/SongLyrics";
+import Register from "./routes/Register";
 import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
@@ -109,6 +110,14 @@ else if(!context?.userid) {
       return (<div>
       <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
+      <a href="/register" > register link</a>
+      <BrowserRouter>
+          <Switch>
+            <Route path="/register">
+              <Register />
+            </Route>
+          </Switch>
+        </BrowserRouter>
     </div>);
 
   }
@@ -135,12 +144,8 @@ else if(!context?.userid) {
           <Nav className="ms-auto" navbar>
             <NavItem>
               <NavLink href="/" onClick={()=>
-                { 
-                   signOutFireBase();
-                  
-                  }}> 
+                { signOutFireBase(); }}> 
                 <FontAwesomeIcon data-tip data-for="signout-icon" icon="fa-solid fa-arrow-right-from-bracket" size="2x">
-                 
                 </FontAwesomeIcon>
                 <ReactTooltip id="signout-icon" place="bottom" effect="solid">
                 Sign Out

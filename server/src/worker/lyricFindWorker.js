@@ -102,9 +102,9 @@ async function lyricWork(job) {
     console.log(playlistName);
     let currentUser = workerData.currentUserName;
     let playListID = workerData.lyricJobPlayListID;
-    let totalsongs = playListTracks.length;
      // dont load any duplicate songs, spotify allows playlists to have duplicate songs.
     playListTracks = playListTracks.filter(removeDuplicateTracks);
+    let totalsongs = playListTracks.length;
     console.log(playListTracks);
 
 

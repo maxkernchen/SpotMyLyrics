@@ -34,7 +34,6 @@ export default class SMLHome extends React.Component {
       searchTerm: '',
       searchResults: [],
       playList: '',
-      existingPlaylists: [],
       listening: false,
       playListProgress: [],
       toastId: ''
@@ -135,14 +134,7 @@ export default class SMLHome extends React.Component {
 
   }
 
-  getExistPlayListOnClick = async (e) => {
-    e.preventDefault();
-    let results = await this.getExistingPlaylists();
-    this.setState({
-      existingPlaylists: results
-    })
-    
-  }
+
 
 
 
@@ -161,18 +153,7 @@ export default class SMLHome extends React.Component {
     }
   }
 
-  async getExistingPlaylists(){
-      const payload = JSON.stringify({username: this.context?.userid});
-      return fetch('http://localhost:3001/userplaylists', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: payload
-      })
-        .then(data => data.json())
-  }
-  
+
 
 
   async addPlayList(playListIDStr){
@@ -197,10 +178,9 @@ export default class SMLHome extends React.Component {
   
     
     let searchResults = this.state.searchResults?.results;
-    let playlistResults = this.state.existingPlaylists?.results;
     let searchTermLen = this.state?.searchTerm.length;
     let foundSongsList;
-    let existingPlayListList;
+
 
 
     console.log(this.context);
@@ -220,24 +200,11 @@ export default class SMLHome extends React.Component {
         foundSongsList = <ListGroupItem key="no results">No results</ListGroupItem>;
       }
     }
-    if(playlistResults){
-        console.log(playlistResults);
-
-        existingPlayListList = playlistResults.map((pl) => <li key={pl.playlistname}>Name: {pl.playlistname} Songs w/Lyrics: 
-        {pl.songswithlyrics} Songs w/o lyrics: {pl.songswithoutlyrics} Last Synced: {pl.lastsynced} 
-        <Link to="/playlistlyrics">lyrics links
-        </Link>
-        </li>);     
-    }
     
     return(
       <>
     <div className="home_center">
-      <h1>View Playlists: </h1>
-      <Button onClick={this.getExistPlayListOnClick}>View Playlists</Button>
-      {existingPlayListList}
-      <br></br>
-
+   
       <h2>Add Playlist!</h2>
       <form onSubmit={this.addPlayListSubmit}> 
         <input type="text" onChange={e => this.setState({

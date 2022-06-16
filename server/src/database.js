@@ -170,7 +170,7 @@ export async function callEmailExists(pool, email){
           let row = rowResult[key];
           if(row){
             result.push({playlistid: row.playlistid, songname: row.songname, 
-              artistname: row.artistname, albumarturl: row.albumart, lyricsfound: row.lyricsfound, url: row.url});
+              artistname: row.artistname, albumarturl: row.albumart, lyricsfound: row.lyricsfound === 1 ? true : false, url: row.url});
           }
         });
       }
@@ -198,6 +198,6 @@ export async function callEmailExists(pool, email){
         await conn.connection.promise().query(storedProcCall, [playlistid, playlistname, totalsongs, issyncing]);
         conn.connection.release();
         }
-      }
+    }
     
 

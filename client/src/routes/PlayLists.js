@@ -21,10 +21,12 @@ import './playlists.css'
 import update from 'immutability-helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
-import { faSync } from '@fortawesome/free-solid-svg-icons'
+import { faSync, faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import ReactTooltip from "react-tooltip";
+import { configFa } from '@fortawesome/fontawesome-svg-core';
+import {config} from '../config'
 
-fontawesome.library.add(faSync);
+fontawesome.library.add(faSync, faCircleCheck, faCircleXmark);
 
 
 
@@ -90,22 +92,40 @@ async getAllUserSongs(){
     .then(data => data.json())
 }
 
-getPlaylistSyncStatus(playlistData){
+getPlaylistSyncStatus(playlistdata){
 
-  if(playlistData.currentlysyncing){
+  if(playlistdata.currentlysyncing){
     return  <>
       <FontAwesomeIcon color='green' icon="fa-solid fa-rotate" spin={true} >  
       </FontAwesomeIcon>
-      <ReactTooltip id={playlistData.playlistid} place="bottom" effect="solid">
+      <ReactTooltip id={playlistdata.playlistid} place="bottom" effect="solid">
           Currently Syncing Playlist
       </ReactTooltip> 
     </>
-
-
-
   }
   else{
-    return "Last Synced: " + playlistData.lastsynced;
+    return "Last Synced: " + playlistdata.lastsynced;
+  }
+
+}
+
+getSongSyncStatus(songdata){
+
+  if(songdata.lyricsfound){
+    return  <>
+    <FontAwesomeIcon  color ="green" icon="fa-solid fa-circle-check" />
+      <Link to={config.songlyricspathquery + new URLSearchParams({url: songdata.url}).toString()}> Full lyrics
+      </Link>
+    </>
+  }
+  else{
+    return <> 
+      <FontAwesomeIcon color='red' icon="fa-solid fa-circle-xmark">
+      </FontAwesomeIcon>
+      <ReactTooltip id={songdata.url} place="bottom" effect="solid">
+          Song Not Synced
+      </ReactTooltip>
+    </>
   }
 
 }
@@ -117,8 +137,8 @@ getPlaylistSyncStatus(playlistData){
    let playlistResults = this.state.existingPlaylists?.results;
    let allusersongsresults = this.state.allUserSongs?.results;
    let existingPlayListList;
-   let searchLyrics = "/songlyrics?"
-   let syncInfo; 
+  
+
    if(this.state.callGetPlaylists){
      this.getExistingPlayListsSetState();
      this.getAllUserSongsSetState()
@@ -135,8 +155,8 @@ getPlaylistSyncStatus(playlistData){
             !this.state.collapsePlayListCard.get(pl.playlistid)}})
         })
        
-       } data-tip data-for={pl.playlistid}>Name: {pl.playlistname} Songs w/Lyrics: 
-      {pl.songswithlyrics} Songs w/o lyrics: {pl.songswithoutlyrics} {this.getPlaylistSyncStatus.call(this, pl)} 
+       } data-tip data-for={pl.playlistid}>Name: {pl.playlistname} Songs:   
+      {pl.songswithlyrics + pl.songswithoutlyrics} {this.getPlaylistSyncStatus.call(this, pl)} 
       
       <Collapse isOpen={this.state.collapsePlayListCard.get(pl.playlistid)}>
         <Card>
@@ -144,14 +164,12 @@ getPlaylistSyncStatus(playlistData){
           <ListGroup flush className="playlist-list">
               {allusersongsresults.map((song) => {
 
-                if(song.playlistid === pl.playlistid){
-                  return <ListGroupItem key={song.songname}>{song.songname}
-                    <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}> Full lyrics</Link>
-                  </ListGroupItem>
-
-                }
-              })
-              
+                  if(song.playlistid === pl.playlistid){
+                    return <ListGroupItem key={song.songname} data-tip data-for={song.url}> <img className='album-art' src={song.albumarturl}/> 
+                              &nbsp; {song.artistname} - {song.songname} &nbsp; {this.getSongSyncStatus.call(this, song)}
+                          </ListGroupItem>
+                  }
+               })
               }
           </ListGroup>
           </CardBody>
