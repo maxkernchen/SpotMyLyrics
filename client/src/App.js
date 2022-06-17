@@ -108,16 +108,26 @@ function App() {
  }
 else if(!context?.userid) {
       return (<div>
-      <p>Please sign-in:</p>
-      <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
-      <a href="/register" > register link</a>
+    
+    
+      <Navbar color="light" light expand="md">
+      <NavbarBrand href="/">Spot My Lyrics</NavbarBrand>
+      </Navbar>
       <BrowserRouter>
           <Switch>
             <Route path="/register">
               <Register />
             </Route>
+            <Route path="/login">
+              <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
+              <a href="/register">register link</a>
+            </Route>
+            <Redirect from="/" to="/login" />
           </Switch>
         </BrowserRouter>
+        
+
+       
     </div>);
 
   }

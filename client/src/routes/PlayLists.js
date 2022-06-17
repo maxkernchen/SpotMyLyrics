@@ -23,7 +23,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
 import { faSync, faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import ReactTooltip from "react-tooltip";
-import { configFa } from '@fortawesome/fontawesome-svg-core';
 import {config} from '../config'
 
 fontawesome.library.add(faSync, faCircleCheck, faCircleXmark);
