@@ -119,7 +119,7 @@ export default class Register extends React.Component {
                   this.createToast("Email is not valid", true);
                 }
                 else{
-                  this.createToast("Error occured creating user" + errorMessage, true);
+                  this.createToast("Error occured creating user: " + errorMessage, true);
                 }
             });
 

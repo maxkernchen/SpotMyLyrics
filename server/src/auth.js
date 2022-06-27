@@ -54,7 +54,7 @@ export const deleteUser = async (uid) => {
     return true;
   }
   catch(error) {
-    console.log('Error deleting user:', error);
+    console.log('Error deleting user: ' + error);
     return false;
   }
 }
