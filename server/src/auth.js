@@ -44,9 +44,20 @@ export const verifyUserToken = async (idToken) =>{
   }
   return false;
   
-} 
+}
 
+export const deleteUser = async (uid) => {
 
+  try{
+    let user = await getAuth().deleteUser(uid);
+    console.log('user deleted');
+    return true;
+  }
+  catch(error) {
+    console.log('Error deleting user:', error);
+    return false;
+  }
+}
 
 
 

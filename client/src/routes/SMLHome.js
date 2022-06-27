@@ -135,10 +135,6 @@ export default class SMLHome extends React.Component {
   }
 
 
-
-
-
-
   async searchLyrics(searchTermStr){
     if(searchTermStr && searchTermStr.trim().length){
       const payload = JSON.stringify({searchterm: searchTermStr.toLowerCase().trim(), username: this.context?.userid});

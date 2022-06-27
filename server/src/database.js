@@ -19,7 +19,7 @@ export function createDBPool(mysql){
 
 // func which calls stored proc to see if the email exists.
 export async function callEmailExists(pool, email){
-      let result;
+      let existsBool = false;
 
       const storedProcCall = 'CALL emailexists(?, @output);select @output;';
 
@@ -31,10 +31,50 @@ export async function callEmailExists(pool, email){
         conn.connection.release();
 
         if(rows)
-          result = rows[1][0]['@output'] == 1; 
+        existsBool = rows[1][0]['@output'] == 1; 
       }
       
-      return result;
+      return existsBool;
+  }  
+
+  // func which calls stored proc to see if the user exists.
+export async function callUserExists(pool, userid){
+  let existsBool = false;
+
+  const storedProcCall = 'CALL userexists(?, @output);select @output;';
+
+  let conn = await pool.promise().getConnection();
+  if(conn){
+    const [rows, fields] = 
+    await conn.connection.promise().query(storedProcCall, [userid]);
+
+    conn.connection.release();
+
+    if(rows)
+      existsBool = rows[1][0]['@output'] == 1; 
+  }
+  
+  return existsBool;
+}  
+
+  // func which calls stored proc to see if the user exists.
+  export async function registeruser(pool, userid, email){
+    let userinserted = false;
+  
+    const storedProcCall = 'CALL registeruser(?, ?, @output); select @output;';
+  
+    let conn = await pool.promise().getConnection();
+    if(conn){
+      const [rows, fields] = 
+      await conn.connection.promise().query(storedProcCall, [userid, email]);
+  
+      conn.connection.release();
+  
+      if(rows)
+        userinserted = rows[1][0]['@output'] == 0; 
+    }
+    
+    return userinserted;
   }  
 
   // func which calls stored proc to get the user id from an email input

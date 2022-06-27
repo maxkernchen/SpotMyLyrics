@@ -83,7 +83,8 @@ function App() {
           console.log("signed in")
           auth.currentUser.getIdToken(true).then(async function(idToken) {
               let useridfromemail = await verifyUserAndEmail(idToken, user.email);
-              setContext({firebaseuser: user, userid: useridfromemail.userid});
+              if(!useridfromemail.error)
+                setContext({firebaseuser: user, userid: useridfromemail.userid});
               setLoading(false);
             })
           }
@@ -109,9 +110,9 @@ function App() {
 else if(!context?.userid) {
       return (<div>
     
-    
+    <CurrentUserContext.Provider value={context}>
       <Navbar color="light" light expand="md">
-      <NavbarBrand href="/">Spot My Lyrics</NavbarBrand>
+      <NavbarBrand href="/">Spot My Lyrics </NavbarBrand>
       </Navbar>
       <BrowserRouter>
           <Switch>
@@ -125,7 +126,7 @@ else if(!context?.userid) {
             <Redirect from="/" to="/login" />
           </Switch>
         </BrowserRouter>
-        
+      </CurrentUserContext.Provider>
 
        
     </div>);
@@ -138,7 +139,7 @@ else if(!context?.userid) {
        
         <CurrentUserContext.Provider value={context}>
         <Navbar color="light" light expand="md">
-        <NavbarBrand href="/">Spot My Lyrics</NavbarBrand>
+        <NavbarBrand href="/">Spot My Lyrics &#40; User: {context.userid}	&#41;</NavbarBrand>
         <NavbarToggler onClick={()=>setIsOpen(!isOpen)} />
         <Collapse isOpen={isOpen} navbar>
         <Nav className="ml-auto" navbar>
@@ -187,10 +188,8 @@ else if(!context?.userid) {
     );
 
   }
-  
-  
-}
 
+}
 
 
 export default App;

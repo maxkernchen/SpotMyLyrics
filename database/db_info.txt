@@ -157,8 +157,24 @@ CREATE PROCEDURE insertlryicsforuserplaylist(IN url varchar(200), IN songname va
         COMMIT;
 
          
-       END //
-       
+END //
+
+
+
+ CREATE PROCEDURE registeruser (IN userid VARCHAR(200), IN email VARCHAR(200), OUT inserteduser TINYINT)
+       BEGIN
+         SELECT COUNT(*) INTO inserteduser FROM spotmylyricsdb.smlusers
+         WHERE smlusers.userid = userid;
+   	 START TRANSACTION;
+         IF(inserteduser = 0) THEN
+         	INSERT INTO smlusers (userid, email, lastlogin, lastsync, loginattempts)
+         	VALUES(userid, email, NOW(), NOW(),0);
+         
+         END IF;
+ 
+         COMMIT;
+ END//
+
 
          
          

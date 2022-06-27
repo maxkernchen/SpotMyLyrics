@@ -1,12 +1,11 @@
 import express from "express";
 import cors from "cors";
-import path from "express";
 import mysql from "mysql2";
 import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, 
-  callGetUserPlaylists, callGetLyrics, callGetAllUserSongs} from "./src/database.js";
+  callGetUserPlaylists, callGetLyrics, callGetAllUserSongs, callUserExists, registeruser} from "./src/database.js";
 import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
-import { verifyUserToken } from "./src/auth.js";
+import { verifyUserToken, deleteUser } from "./src/auth.js";
 
 
 
@@ -42,15 +41,25 @@ app.post('/verifyuser', async function(req, res) {
       }
       else{
         res.send({
-          userid: 'invalid token'
+          error: 'invalid token'
          }); 
       }
     }
     else{
       res.send({
-        userid: 'invalid email'
+        error: 'invalid email'
        }); 
     }
+});
+
+app.post('/deleteuser', async function(req, res) {
+  if(await deleteUser(req.body.uid)){
+    res.send({result:"deleted user"});
+  }
+  else{
+    res.send({error:"error deleting user"});
+  }
+
 });
 
 
@@ -81,6 +90,24 @@ app.post("/userplaylists", async function(req, res){
 app.post("/allusersongs", async function(req, res){
   let resultsAllUserSongs = await callGetAllUserSongs(pool, req.body.username);
   res.send({results: resultsAllUserSongs});
+  
+});
+
+app.post("/register", async function(req, res){
+
+  if(await callEmailExists(pool, req.body.email)){
+    res.send({error: "Email already exists"});
+  }
+  else if(await callUserExists(pool, req.body.username)){
+    res.send({error : "User already exists"});
+  }
+  else if(await registeruser(pool, req.body.username, req.body.email)){
+
+    res.send({results: req.body.username + " user created"});
+  }
+  else{
+    res.send({error : "Error creating user in database"});
+  }
   
 });
 
