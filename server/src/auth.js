@@ -8,26 +8,7 @@ const app = initializeApp({
   credential: cert(serviceAccount)
 });
 
-
-export const authFireBaseTokenMiddleware = async (req, res, next) => {
-  const header = req.headers.authorization;
-
-  if (header) {
-    const idToken = authHeader.split("|")[1];
-    admin
-      .auth()
-      .verifyIdToken(idToken)
-      .then(function (decodedToken) {
-        return next();
-      })
-      .catch(function (error) {
-        console.log(error);
-        return res.sendStatus(403);
-      });
-  } else {
-    res.sendStatus(401);
-  }
-};
+// helper methods for Firebase admin sdk, can only run on server side.
 
 export const verifyUserToken = async (idToken) =>{
 
@@ -48,7 +29,7 @@ export const verifyUserToken = async (idToken) =>{
 
 export const deleteUser = async (uid) => {
 
-  try{
+  try {
     let user = await getAuth().deleteUser(uid);
     console.log('user deleted');
     return true;
@@ -57,6 +38,7 @@ export const deleteUser = async (uid) => {
     console.log('Error deleting user: ' + error);
     return false;
   }
+
 }
 
 

@@ -221,23 +221,44 @@ export async function callUserExists(pool, userid){
 
 
    export async function callInsertLyricsForUserPlaylist(url, songname, artistname, albumart, lyrics, lyricsfound, userid, playlistid){
-    const storedProcCall = 'CALL insertlryicsforuserplaylist(?, ?, ?, ? ,?, ?, ?, ?);';
+    const storedProcCall = 'CALL insertlyricsforuserplaylist(?, ?, ?, ? ,?, ?, ?, ?);';
     let conn = await getConnectionPool().promise().getConnection();
     if(conn){
       const [rows, fields] = 
-      await conn.connection.promise().query(storedProcCall, [url, songname, artistname, albumart, lyrics, lyricsfound, userid, playlistid]);
+      await conn.connection.promise().query(storedProcCall, [url, songname, artistname, albumart, lyrics, lyricsfound, userid, playlistid + "_" + userid]);
       conn.connection.release();
       }
     }
 
-    export async function callInsertOrUpdateSmlPlaylist(playlistid, playlistname, totalsongs, issyncing){
+    export async function callInsertOrUpdateSmlPlaylist(playlistid, playlistname, totalsongs, issyncing, userid){
       const storedProcCall = 'CALL insertorupdatesmlplaylist(?, ?, ?, ?);';
       let conn = await getConnectionPool().promise().getConnection();
       if(conn){
         const [rows, fields] = 
-        await conn.connection.promise().query(storedProcCall, [playlistid, playlistname, totalsongs, issyncing]);
+        await conn.connection.promise().query(storedProcCall, [playlistid + "_" + userid, playlistname, totalsongs, issyncing]);
         conn.connection.release();
         }
     }
+
+    export async function deletePlaylistForUser(playlistid, userid){
+      const storedProcCall = 'CALL deleteplaylistforuser(?, ?);';
+      let playlistDeleted = false;
+      let conn = await getConnectionPool().promise().getConnection();
+
+      try{
+      if(conn){
+        const [rows, fields] = 
+        await conn.connection.promise().query(storedProcCall, [userid, playlistid]);
+        conn.connection.release();
+        playlistDeleted = true;
+        }
+      }catch(error){
+        console.log("error deleting playlist " + error);
+        playlistDeleted = false;
+      }
+
+      return playlistDeleted;
+    }
+
     
 

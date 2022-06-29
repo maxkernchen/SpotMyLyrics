@@ -3,6 +3,11 @@
     margin-top: 1rem;
 }
 
+.list-div{
+    display: inherit;
+    margin-left: 1em;
+}
+
 .home-center{
     white-space: pre-wrap;
     text-align: center;
@@ -14,4 +19,8 @@
     border-radius: 50%;
     width: 3em;
     height: 3em;
+}
+.side-button{
+    height: 3em;
+    margin: .2em;
 }

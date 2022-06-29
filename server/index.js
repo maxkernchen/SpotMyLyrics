@@ -2,12 +2,10 @@ import express from "express";
 import cors from "cors";
 import mysql from "mysql2";
 import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, 
-  callGetUserPlaylists, callGetLyrics, callGetAllUserSongs, callUserExists, registeruser} from "./src/database.js";
+  callGetUserPlaylists, callGetLyrics, callGetAllUserSongs, callUserExists, registeruser, deletePlaylistForUser} from "./src/database.js";
 import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
 import { verifyUserToken, deleteUser } from "./src/auth.js";
-
-
 
 
 const app = express();
@@ -22,12 +20,9 @@ initalizeSpotifyApi();
 
 let clients = [];
 
-
-
 export function getConnectionPool() {
   return pool;
 }
-
 
 app.post('/verifyuser', async function(req, res) {
  
@@ -60,6 +55,16 @@ app.post('/deleteuser', async function(req, res) {
     res.send({error:"error deleting user"});
   }
 
+});
+
+
+app.post('/deleteplaylist', async function(req, res) {
+    if(await deletePlaylistForUser(req.body.playlistid, req.body.username)){
+      res.send({result:"Deleted playlist"});
+    }
+    else{
+      res.send({error:"Error deleting playlist"});
+    }  
 });
 
 
@@ -113,8 +118,6 @@ app.post("/register", async function(req, res){
 
 
 
-
-
 function progessHandler(request, response, next) {
   const headers = {
     'Content-Type': 'text/event-stream',
@@ -122,10 +125,7 @@ function progessHandler(request, response, next) {
     'Cache-Control': 'no-cache'
   };
   response.writeHead(200, headers);
-  let test = 'test SSE!';
-  const data = `data: ${JSON.stringify(test)}\n\n`;
 
-  response.write(data);
 
   // TODO maybe replace with UUID
   const clientId = Date.now();
@@ -138,7 +138,6 @@ function progessHandler(request, response, next) {
   clients.push(newClient);
 
   request.on('close', () => {
-    console.log(`${clientId} Connection closed`);
     clients = clients.filter(client => client.id !== clientId);
   }); 
   
@@ -150,17 +149,6 @@ export function updatePlayListProgress(progressData){
 
 app.get('/playlistprogress', progessHandler);
 
-
-app.get('/setcookie', (req, res) => {
-  res.cookie(`Cookie token name`,`encrypted cookie string Value`,{
-      maxAge: 60*60*24,
-      secure: true,
-      httpOnly: true,
-      sameSite: 'lax'
-  });
-  res.send('Cookie have been saved successfully');
-});
-  
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
