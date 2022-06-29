@@ -9,9 +9,9 @@ create table smluserlyrics(url varchar(200) primary key, songname varchar(200), 
 
         
         
-create table smlplaylist(playlistid varchar(200) primary key, playlistname varchar(200), lastsynced datetime, totalsongs int, songswithlyrics int, songswithoutlyrics int, issyncing tinyint);
+create table smlplaylist(playlistid varchar(400) primary key, playlistname varchar(200), lastsynced datetime, totalsongs int, songswithlyrics int, songswithoutlyrics int, issyncing tinyint);
 
-create table smlusersongmapping(userid varchar(50), url varchar(200), playlistid varchar(200),
+create table smlusersongmapping(userid varchar(50), url varchar(200), playlistid varchar(400),
 index user_idx (userid), index url_idx (url), index playlist_idx (playlistid),
  FOREIGN KEY (userid)
         REFERENCES smlusers(userid)
@@ -59,7 +59,7 @@ CREATE PROCEDURE getlyrics(IN userid VARCHAR(50), IN url VARCHAR(1000))
          WHERE smluserlyrics.url = url;
        END//
        
-CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(200), IN playlistname varchar(200), IN totalsongs INT, IN issyncing tinyint)
+CREATE PROCEDURE insertorupdatesmlplaylist(IN playlistid VARCHAR(400), IN playlistname varchar(200), IN totalsongs INT, IN issyncing tinyint)
        BEGIN
          DECLARE playlistexists TINYINT DEFAULT 0;
          DECLARE songswithoutlyrics INT DEFAULT 0;
@@ -106,7 +106,7 @@ CREATE PROCEDURE getallusersongs(IN userid VARCHAR(50))
 
 END//
 
-CREATE PROCEDURE insertlryicsforuserplaylist(IN url varchar(200), IN songname varchar(200), IN artistname varchar(200), IN albumart varchar(200), IN lyrics text, IN lyricsfound TINYINT, IN userid varchar(50), IN playlistid varchar(200))
+CREATE PROCEDURE insertlyricsforuserplaylist(IN url varchar(200), IN songname varchar(200), IN artistname varchar(200), IN albumart varchar(200), IN lyrics text, IN lyricsfound TINYINT, IN userid varchar(50), IN playlistid varchar(400))
        BEGIN
          DECLARE songexists TINYINT DEFAULT 0;
  	 DECLARE songexistswithoutlyrics TINYINT DEFAULT 0;
@@ -142,7 +142,7 @@ CREATE PROCEDURE insertlryicsforuserplaylist(IN url varchar(200), IN songname va
 		SELECT count(*) into mappingalreadyexists
          	FROM spotmylyricsdb.smluserlyrics
          	JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.url = 
-         	smluserlyrics.url AND smlusersongmapping.userid = userid AND 
+         	url AND smlusersongmapping.userid = userid AND 
          	smlusersongmapping.playlistid = playlistid;
          	-- only insert mapping if its not already there
          	IF(mappingalreadyexists = 0) THEN
@@ -174,10 +174,50 @@ END //
  
          COMMIT;
  END//
+ 
+ 
+ 
+  CREATE PROCEDURE deleteplaylistforuser (IN userid VARCHAR(200), IN playlistid VARCHAR(200))
+  
+	BEGIN
+         DECLARE songurltodelete VARCHAR(200) DEFAULT "";
+ 	 DECLARE finished INTEGER DEFAULT 0;
+
+         -- cursor for songs which we are okay to delete, no other user or playlist has these stored.
+         DECLARE cursorsongstodelete 
+		CURSOR FOR 
+			SELECT url from smluserlyrics where url not in (
+				SELECT smluserlyrics.url
+			 	FROM spotmylyricsdb.smluserlyrics
+			 	JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.url = 
+			 	smluserlyrics.url AND (smlusersongmapping.userid <> userid
+			 	OR smlusersongmapping.playlistid <> playlistid));
+	DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;		 	
+	 
+	START TRANSACTION;
+	
+        OPEN cursorsongstodelete;
+        
+        songstodeleteloop: LOOP
+		FETCH cursorsongstodelete INTO songurltodelete;
+		IF finished = 1 THEN 
+			LEAVE songstodeleteloop;
+		END IF;
+		delete from smluserlyrics where url = songurltodelete;
+		
+		--SELECT concat('deleting song ', songurltodelete);
+	END LOOP songstodeleteloop;
+	
+        CLOSE cursorsongstodelete;
+         
+        delete from smlplaylist where smlplaylist.playlistid = playlistid;
+        --SELECT concat('deleting playlist ', playlistid);
+        
+        COMMIT;
+ END//
 
 
-         
-         
        
        
        

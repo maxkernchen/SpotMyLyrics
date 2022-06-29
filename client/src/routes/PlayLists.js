@@ -14,32 +14,37 @@ import {
   Card,
   CardBody,
   UncontrolledCollapse,
-  Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
+  Button, Input, ListGroup, ListGroupItem
+, Modal, ModalBody, ModalHeader,ModalFooter} from 'reactstrap';
 import { CurrentUserContext } from "../CurrentUserContext";
 import { Link } from 'react-router-dom';
 import './playlists.css'
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import update from 'immutability-helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
-import { faSync, faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import { faSync, faCircleCheck, faCircleXmark, faArrowsRotate, faTrash, faLeaf } from '@fortawesome/free-solid-svg-icons'
 import ReactTooltip from "react-tooltip";
 import {config} from '../config'
 
-fontawesome.library.add(faSync, faCircleCheck, faCircleXmark);
-
-
-
+fontawesome.library.add(faSync, faCircleCheck, faCircleXmark, 
+  faArrowsRotate, faTrash);
 
 
 export default class PlayLists extends React.Component {
   constructor() {
     super()
-    
+    toast.configure();
+
     this.state = {
       existingPlaylists: [],
       allUserSongs: [],
       collapsePlayListCard: new Map(),
-      callGetPlaylists: true
+      callGetPlaylists: true,
+      toastId: '',
+      currentlyRefreshingPlaylist: '',
+      toggleDeleteDialog: false
     };
 
 
@@ -91,9 +96,35 @@ async getAllUserSongs(){
     .then(data => data.json())
 }
 
+async deletePlaylistForUser(playlistid, username){
+  const payload = JSON.stringify({playlistid: playlistid, username: username});
+  return fetch('http://localhost:3001/deleteplaylist', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: payload
+  })
+    .then(data => data.json())
+}
+
+async deletePlaylist(playlistid, username){
+    let results = await this.deletePlaylistForUser(playlistid, username);
+    if(results.error){
+      this.createToast(results.error, true, false);
+    }
+    else{
+      this.createToast(results.result, false, false);
+    }
+    // reset state to refresh page and refetch other playlists
+    this.setState({callGetPlaylists: true});
+
+}
+
 getPlaylistSyncStatus(playlistdata){
 
-  if(playlistdata.currentlysyncing){
+  if(playlistdata.currentlysyncing || playlistdata.playlistname === this.state.currentlyRefreshingPlaylist){
+    playlistdata.currentlysyncing = true;
     return  <>
       <FontAwesomeIcon color='green' icon="fa-solid fa-rotate" spin={true} >  
       </FontAwesomeIcon>
@@ -129,6 +160,104 @@ getSongSyncStatus(songdata){
 
 }
 
+createToast(message, iserror, isplaylist){
+
+  if(iserror){
+     toast.error(message, {
+      position: "bottom-right",
+      autoClose: true,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false
+      });
+  }
+  else if (isplaylist){
+    let toastIdCreated = toast.loading('Refreshing Playlist  ' + 
+    this.state.currentlyRefreshingPlaylist, {
+      position: "bottom-right",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: false,
+      progress: 0,
+      });
+      // only store toast id for playlist re-sync
+   
+    this.setState({toastId: toastIdCreated})
+    
+  }
+  else{
+    toast.success(message, {
+      position: "bottom-right",
+      autoClose: true,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false
+      });
+  }
+}
+
+
+async addPlayList(playListIDStr){
+
+  if(playListIDStr && playListIDStr.trim().length){
+    const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: this.context?.userid});
+    return fetch('http://localhost:3001/addplaylist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: payload
+    })
+      .then(data => data.json());
+  }
+}
+
+
+async refreshPlaylist(playlistid, playlistname)  {
+  
+  // we store the playlist in the db as playlistid_userid to 
+  // help differ duplicate playlists added by different users.
+  // However when refreshing we need to remove the _userid
+  const splitPlayList = playlistid.split("_");
+
+  let results = await this.addPlayList(splitPlayList[0]);
+  console.log(results.playListName);
+  if(!results.error){
+    this.setState({currentlyRefreshingPlaylist: playlistname});
+    this.setState({callGetPlaylists: true});
+    this.createToast(results.playListName, false, true);
+
+    const events = new EventSource('http://localhost:3001/playlistprogress');
+
+    events.onmessage = (event) => {
+      const parsedData = JSON.parse(event.data);
+      
+      if(parsedData.progress && this.state.toastId && parsedData.playListID === splitPlayList[0] &&
+        parsedData.username === this.context?.userid){
+        toast.update(this.state.toastId, {progress: parsedData.progress});
+        if(parsedData.progress === 1){
+          events.close();
+          this.setState({toastId: ''});
+          this.setState({currentlyRefreshingPlaylist: ''});
+          this.setState({callGetPlaylists: true});
+
+        }
+      }
+    };
+
+  }
+  else{
+    this.createToast(results.error, true, false);
+  }
+
+  
+
+}
+
 
   render() { 
 
@@ -136,6 +265,9 @@ getSongSyncStatus(songdata){
    let playlistResults = this.state.existingPlaylists?.results;
    let allusersongsresults = this.state.allUserSongs?.results;
    let existingPlayListList;
+
+   const toggle = () => this.setState({toggleDeleteDialog:!this.state.toggleDeleteDialog});
+
   
 
    if(this.state.callGetPlaylists){
@@ -147,7 +279,44 @@ getSongSyncStatus(songdata){
    if(playlistResults && allusersongsresults){
       console.log(playlistResults);
       
-      existingPlayListList = playlistResults.map((pl) => <Button className="list-group-item list-group-item-action" 
+      existingPlayListList = playlistResults.map((pl) => <div className="list-div">
+        <Button outline color="danger" className="side-button" disabled={pl.currentlysyncing} onClick={() =>  this.setState({toggleDeleteDialog: true})}
+         data-tip data-for={pl.playlistid + "_delete"} >
+        <FontAwesomeIcon color ="red" icon="fa-solid fa-trash" /> 
+            <ReactTooltip id={pl.playlistid + "_delete"}  place="bottom" effect="solid">
+                Delete Playlist
+            </ReactTooltip>
+        </Button>
+
+        <Modal isOpen={this.state.toggleDeleteDialog} toggle={toggle}>
+            <ModalHeader toggle={toggle}>
+              Deleting {pl.playlistname}
+            </ModalHeader>
+            <ModalBody>
+              Are you sure you want to delete PlayList: "{pl.playlistname}"
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                color="danger"
+                onClick={() => this.deletePlaylist(pl.playlistid, this.context?.userid)}>
+                Delete Playlist
+              </Button>
+              {' '}
+              <Button onClick={toggle}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+
+        <Button outline color="success" className="side-button" disabled={pl.currentlysyncing} data-tip data-for={pl.playlistid + "_refresh"} 
+            onClick={() =>  this.refreshPlaylist(pl.playlistid, pl.playlistname)}>
+            <FontAwesomeIcon color ="green" icon="fa-solid fa-arrows-rotate" /> 
+
+            <ReactTooltip id={pl.playlistid + "_refresh"}  place="bottom" effect="solid">
+                Refresh Playlist
+            </ReactTooltip>
+        </Button>
+        <Button className="list-group-item list-group-item-action" 
        key={pl.playlistname} onClick={ () =>
         this.setState({
           collapsePlayListCard: update(this.state.collapsePlayListCard, {[pl.playlistid]: {$set: 
@@ -175,6 +344,12 @@ getSongSyncStatus(songdata){
         </Card>
       </Collapse>
       </Button>
+     
+
+
+      </div>
+      
+      
       );    
     }
  
@@ -182,7 +357,7 @@ getSongSyncStatus(songdata){
     return(
           <div className="home-center">
             <ListGroup flush className="playlist-list">
-                {existingPlayListList}
+                {existingPlayListList}      
             </ListGroup>
        
           </div>

@@ -23,11 +23,9 @@ await queueJob.clean(0, 'delayed');
 await queueJob.clean(0, 'failed');
 await queueJob.obliterate({ force: true })
 
-//TODO best way to handle this?
-//if we use await if another job comes through it waits until it finishes
-// if we don't use it then we won't be able to track if a job is active or not.
-// maybe best thing is to allow user to only create one job at a time.
-// could try concurrency option. 
+// allow two maximum jobs at once, but no user may submit more than one job at a time.
+// Two users may run two jobs concurrently 
+// Could be increased if bigger server is hosting
 queueJob.process(2, async (job, done) => {
     await lyricWork(job);
     done();
@@ -109,7 +107,7 @@ async function lyricWork(job) {
 
 
  
-    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, config.currentlySyncingPlaylist);
+    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, config.currentlySyncingPlaylist, currentUser);
     
     for(let i = 0; i < playListTracks.length; i++){
         let track = playListTracks[i];
@@ -139,13 +137,13 @@ async function lyricWork(job) {
     console.log('Done!');
     // update playlist again as we now know songs with and without lyrics.
     //  Also update syncing flag for UI 
-    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, config.doneSyncingPlaylist);
+    await callInsertOrUpdateSmlPlaylist(playListID, playlistName, totalsongs, config.doneSyncingPlaylist, currentUser);
 
     
 }
 
 async function findPlayListTracks(playListID) {
-    const spotifyApi = getCurrentApiObj();
+    const spotifyApi = await getCurrentApiObj();
     let allTracks = [];
      return spotifyApi.getPlaylistTracks(
         playListID).then(async function(data) {
@@ -165,7 +163,7 @@ async function findPlayListTracks(playListID) {
 }
 
 async function findPlayListName(playListID) {
-    const spotifyApi = getCurrentApiObj();
+    const spotifyApi = await getCurrentApiObj();
     let playlistName = '';
      return spotifyApi.getPlaylist(
         playListID).then(async function(data) {

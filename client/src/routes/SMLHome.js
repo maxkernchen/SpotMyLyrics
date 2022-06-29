@@ -84,7 +84,8 @@ export default class SMLHome extends React.Component {
         const parsedData = JSON.parse(event.data);
 
         console.log(parsedData);
-        if(parsedData.progress && this.state.toastId){
+        if(parsedData.progress && this.state.toastId && parsedData.playListID === this.state.playList &&
+          parsedData.username === this.context?.userid){
           toast.update(this.state.toastId, {progress: parsedData.progress});
           if(parsedData.progress === 1){
             events.close();

@@ -127,7 +127,7 @@ export default class Register extends React.Component {
             let results = await this.registerUserToDatabase(this.state.email, this.state.username);
             if(results.error){
               // delete user from Firebase so db and firebase are not out of sync
-              await this.deleteuser(userFirebase.uid);
+              await this.deleteuserFireBase(userFirebase.uid);
               this.createToast(results.error, true);
             }
             else{
@@ -181,7 +181,7 @@ export default class Register extends React.Component {
     }
 
 
-    async deleteuser(uid){
+    async deleteuserFireBase(uid){
 
         const payload = JSON.stringify({uid: uid});
         return fetch('http://localhost:3001/deleteuser', {
