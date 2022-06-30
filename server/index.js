@@ -126,7 +126,6 @@ function progessHandler(request, response, next) {
   };
   response.writeHead(200, headers);
 
-
   // TODO maybe replace with UUID
   const clientId = Date.now();
 

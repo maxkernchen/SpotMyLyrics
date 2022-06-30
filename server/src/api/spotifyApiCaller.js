@@ -7,6 +7,7 @@ const spotifyApi = new SpotifyWebApi({
   });
 
 var accessDate;
+var errorSpotifyApiGet = false;;
 
 // TODO make sure we get new token every 30 mins or so.
  export async function initalizeSpotifyApi() {
@@ -24,7 +25,9 @@ var accessDate;
           console.log(
             'Something went wrong when retrieving an access token',
             err.message
+
           );
+          errorSpotifyApiGet = true;
         }
       );
 }
@@ -33,8 +36,9 @@ var accessDate;
 export async function getCurrentApiObj() {
     let now = new Date();
     let expiresDate = new Date(accessDate.getTime() + config.spotifyexpiresin);
-    if(now >= expiresDate){
+    if(now >= expiresDate || errorSpotifyApiGet){
       console.log('Renewing access token Spotify API');
+      errorSpotifyApiGet = false;
       await initalizeSpotifyApi();
 
     }
