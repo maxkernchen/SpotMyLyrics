@@ -1,7 +1,5 @@
 import { initializeApp, cert, } from "firebase-admin/app";
-
 import {getAuth} from "firebase-admin/auth"
-
 import serviceAccount from "/home/max/Documents/Projects/firebasePK/firebaseSMLAccountKey.json" assert { type: 'json' };
 
 const app = initializeApp({

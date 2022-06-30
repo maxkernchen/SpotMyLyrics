@@ -29,6 +29,9 @@ import {
   DropdownItem } from 'reactstrap';
   import ReactTooltip from "react-tooltip";
 
+  import icon from './sml_icon.png'
+
+
 
 
 fontawesome.library.add(faArrowRightFromBracket, faRotate);
@@ -139,13 +142,13 @@ else if(!context?.userid) {
        
         <CurrentUserContext.Provider value={context}>
         <Navbar color="light" light expand="md">
-        <NavbarBrand href="/">Spot My Lyrics &#40; User: {context.userid}	&#41;</NavbarBrand>
+        <NavbarBrand href="/"> <img className="home-icon" src={icon}/> Spot My Lyrics </NavbarBrand>
         <NavbarToggler onClick={()=>setIsOpen(!isOpen)} />
         <Collapse isOpen={isOpen} navbar>
         <Nav className="ml-auto" navbar>
             <NavItem>
               <NavLink href="/playlists" data-tip data-for="playlists-link">
-                 Play Lists
+                 PlayLists
                 <ReactTooltip id="playlists-link" place="bottom" effect="solid">
                 View Synced Playlists 
               </ReactTooltip>
@@ -153,6 +156,9 @@ else if(!context?.userid) {
             </NavItem>
           </Nav>
           <Nav className="ms-auto" navbar>
+            <NavbarBrand>
+             &#40; User: {context.userid}	&#41;
+             </NavbarBrand>
             <NavItem>
               <NavLink href="/" onClick={()=>
                 { signOutFireBase(); }}> 

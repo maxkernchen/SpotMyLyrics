@@ -42,6 +42,14 @@
   left:50%;
   transform:translate(-50%,-50%)
 }
+.home-icon{
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+
+}
   
 
 @keyframes App-logo-spin {
@@ -52,5 +60,7 @@
     transform: rotate(360deg);
   }
 }
+
+
 
 
