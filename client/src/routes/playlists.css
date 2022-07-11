@@ -5,22 +5,21 @@
 
 .list-div{
     display: inherit;
-    margin-left: 1em;
+    margin-left: 1rem;
+    margin-right: 1rem;
 }
 
-.home-center{
-    white-space: pre-wrap;
+.playlist-center{
     text-align: center;
-
 }
-.album-art{
+.album-art-playlist{
     margin-left: auto;
     margin-right: auto;
     border-radius: 50%;
-    width: 3em;
-    height: 3em;
+    width: 3rem;
+    height: 3rem;
 }
 .side-button{
-    height: 3em;
-    margin: .2em;
+    height: 3rem;
+    margin: .2rem;
 }

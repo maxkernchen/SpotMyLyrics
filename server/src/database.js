@@ -124,7 +124,7 @@ export async function callUserExists(pool, userid){
           let highightedlyrics = lyrics.substring(searchIndex, endBoundSearch) + config.highLightEllipses;
           // replace new line with space so it can fit into list element on client side
           if(row){
-            result.push({artistname: row.artistname, songname: row.songname, highlight: highightedlyrics, url: row.url});
+            result.push({artistname: row.artistname, songname: row.songname, highlight: highightedlyrics, url: row.url, albumarturl: row.albumart});
           }
         });
       }

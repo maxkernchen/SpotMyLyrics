@@ -1,8 +1,23 @@
-.home_center{
-    white-space: pre-wrap;
+.home-center{
     text-align: center;
+    margin-left: 10%;
+    margin-right: 10%;
+
+
 
 }
-.lyric_list{
+
+.results-center{
     text-align: center;
+    margin-left: 25%;
+    margin-right: 25%;
 }
+
+.album-art-search{
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+}
+

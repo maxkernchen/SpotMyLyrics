@@ -3,7 +3,7 @@
     text-align: center;
 
 }
-.album_art{
+.album-art-lyrics{
 
     display: block;
     margin-left: auto;
@@ -11,6 +11,12 @@
     border-radius: 50%;
     width: 10%;
     height: auto;
+}
+
+.song-spotify-link{
+
+    text-decoration: none;
+
 }
 
 

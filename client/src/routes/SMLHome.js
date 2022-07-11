@@ -16,8 +16,9 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
+  Button, Input, InputGroup, ListGroup, ListGroupItem} from 'reactstrap';
 import { CurrentUserContext } from "../CurrentUserContext";
+import {config} from "../config.js";
 
 
 
@@ -71,8 +72,8 @@ export default class SMLHome extends React.Component {
 
   
 
-  addPlayListSubmit = async (e) => {
-    e.preventDefault();
+  async addPlayListClick (){
+   
     let results = await this.addPlayList(this.state.playList);
     console.log(results.playListName);
     if(!results.error){
@@ -178,19 +179,17 @@ export default class SMLHome extends React.Component {
     let searchTermLen = this.state?.searchTerm.length;
     let foundSongsList;
 
-
-
     console.log(this.context);
 
     if(searchResults){
       console.log(searchResults);
-      let searchLyrics = "/songlyrics?"
      
       if(searchResults.length > 0){
         
-        foundSongsList = searchResults.map((song) =>  <ListGroupItem key={song.songname}>{song.songname} - {song.artistname} 
+        foundSongsList = searchResults.map((song) =>  <ListGroupItem key={song.songname}> 
+        <img className='album-art-search' src={song.albumarturl}/>  {song.songname} - {song.artistname} 
         (<mark>{song.highlight.substring(0,searchTermLen)}</mark>{song.highlight.substring(searchTermLen, song.highlight.length + 1)}) - 
-        <Link to={searchLyrics + new URLSearchParams({url: song.url}).toString()}> Full lyrics</Link>
+        <Link to={config.songlyricspathquery + new URLSearchParams({url: song.url}).toString()}> Full lyrics</Link>
         </ListGroupItem>);
       }
       else{
@@ -199,28 +198,35 @@ export default class SMLHome extends React.Component {
     }
     
     return(
-      <>
-    <div className="home_center">
-   
-      <h2>Add Playlist!</h2>
-      <form onSubmit={this.addPlayListSubmit}> 
-        <input type="text" onChange={e => this.setState({
-        playList: e.target.value
-        })}/>
-        <Button color="success" type="submit">Add Playlist</Button>
-      </form>
-      <h2>Search Lyrics!</h2>
-      <label>
-            <p>Search!</p>
-            <input type="text" onChange={this.handleInputChangeLyricSearch}/>
-        </label>
+    <>
+      <div className="home-center">
+    
+        <h2>Add Playlist</h2>
+        <InputGroup>
+          
+            <Input onChange={e => this.setState({
+            playList: e.target.value
+            })}/>
+
+            <Button color="success" onClick={() => this.addPlayListClick()} >Add Playlist</Button>
+          
+        </InputGroup>
       </div>
-      <div>
-        <ListGroup flush className="lyric_list">
-        {foundSongsList}
-        </ListGroup>
-        </div>
-    </>
+      
+
+
+      <div className="results-center">
+        <h2>Search For Lyrics</h2>
+        <InputGroup>
+          <Input onChange={this.handleInputChangeLyricSearch} placeholder="Search All Songs"/>
+        </InputGroup>
+      
+          <ListGroup flush>
+            {foundSongsList}
+          </ListGroup>
+      </div>
+
+   </>
     
   );
   }

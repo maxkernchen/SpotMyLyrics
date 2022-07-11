@@ -142,7 +142,12 @@ else if(!context?.userid) {
        
         <CurrentUserContext.Provider value={context}>
         <Navbar color="light" light expand="md">
-        <NavbarBrand href="/"> <img className="home-icon" src={icon}/> Spot My Lyrics </NavbarBrand>
+        <NavbarBrand href="/" data-tip data-for="home-link"><img className="home-icon" src={icon}/> 
+            Spot My Lyrics 
+          <ReactTooltip id="home-link" place="bottom" effect="solid">
+              Go Home
+          </ReactTooltip>
+        </NavbarBrand>
         <NavbarToggler onClick={()=>setIsOpen(!isOpen)} />
         <Collapse isOpen={isOpen} navbar>
         <Nav className="ml-auto" navbar>
@@ -150,8 +155,8 @@ else if(!context?.userid) {
               <NavLink href="/playlists" data-tip data-for="playlists-link">
                  PlayLists
                 <ReactTooltip id="playlists-link" place="bottom" effect="solid">
-                View Synced Playlists 
-              </ReactTooltip>
+                  View Synced Playlists 
+                </ReactTooltip>
               </NavLink>
             </NavItem>
           </Nav>

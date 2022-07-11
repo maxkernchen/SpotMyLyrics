@@ -279,7 +279,8 @@ async refreshPlaylist(playlistid, playlistname)  {
    if(playlistResults && allusersongsresults){
       console.log(playlistResults);
       
-      existingPlayListList = playlistResults.map((pl) => <div className="list-div">
+      existingPlayListList = playlistResults.map((pl) => 
+      <div className="list-div">
         <Button outline color="danger" className="side-button" disabled={pl.currentlysyncing} onClick={() =>  this.setState({toggleDeleteDialog: true})}
          data-tip data-for={pl.playlistid + "_delete"} >
         <FontAwesomeIcon color ="red" icon="fa-solid fa-trash" /> 
@@ -333,7 +334,7 @@ async refreshPlaylist(playlistid, playlistname)  {
               {allusersongsresults.map((song) => {
 
                   if(song.playlistid === pl.playlistid){
-                    return <ListGroupItem key={song.songname} data-tip data-for={song.url}> <img className='album-art' src={song.albumarturl}/> 
+                    return <ListGroupItem key={song.songname} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
                               &nbsp; {song.artistname} - {song.songname} &nbsp; {this.getSongSyncStatus.call(this, song)}
                           </ListGroupItem>
                   }
@@ -344,24 +345,18 @@ async refreshPlaylist(playlistid, playlistname)  {
         </Card>
       </Collapse>
       </Button>
-     
-
-
-      </div>
+    </div>
       
       
       );    
     }
  
-   
     return(
-          <div className="home-center">
+          <div className="playlist-center">
             <ListGroup flush className="playlist-list">
                 {existingPlayListList}      
             </ListGroup>
-       
           </div>
-    
         )
     }
 }

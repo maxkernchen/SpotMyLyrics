@@ -67,20 +67,17 @@ export default class SongLyrics extends React.Component {
     
     return(
 
-      
        <>
-  
-     
-      <img className='album_art' src={this.state.fullSongLyrics.results?.albumarturl}></img>
-      <br></br>
-      <h2 className='lyrics'>{this.state.fullSongLyrics.results?.artistname} - {this.state.fullSongLyrics.results?.songname}</h2>
-      <br></br>
-      <p className='lyrics'> {this.state.fullSongLyrics.results?.fulllyrics}</p>
-      
+        <img className="album-art-lyrics" src={this.state.fullSongLyrics.results?.albumarturl}></img>
+        <br/>
+        <h2 className="lyrics">
+          <a href={lyricPayload.url} className="song-spotify-link">
+            {this.state.fullSongLyrics.results?.artistname} - {this.state.fullSongLyrics.results?.songname}
+          </a> 
+        </h2>
+        <br/>
+        <p className="lyrics"> {this.state.fullSongLyrics.results?.fulllyrics}</p>
       </>
-        
-      
-    
         );
     }
 }
