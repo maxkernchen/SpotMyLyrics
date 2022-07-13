@@ -81,8 +81,6 @@ function App() {
   const [darkModeChanged, setDarkModeChanged] = useState(false);
 
 
-
-
     useEffect(()=>{
       
    
@@ -96,6 +94,10 @@ function App() {
                   let darkModeBool = false;
                   if(typeof JSON.parse(window.sessionStorage.getItem("darkmode")) == "boolean"){
                     darkModeBool = JSON.parse(window.sessionStorage.getItem("darkmode"));
+                  }
+                  // set session table if empty
+                  else{
+                    window.sessionStorage.setItem("darkmode", darkModeBool);
                   }                
                   setContext({firebaseuser: user, userid: useridfromemail.userid, darkmode: darkModeBool});
               }
