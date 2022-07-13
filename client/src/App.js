@@ -14,7 +14,7 @@ import 'firebase/compat/auth';
 import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
-import { faArrowRightFromBracket, faRotate } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faRotate, faWindowRestore } from '@fortawesome/free-solid-svg-icons'
 import {
   Collapse,
   Navbar,
@@ -26,7 +26,8 @@ import {
   Tooltip,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem } from 'reactstrap';
+  DropdownItem, 
+  Button} from 'reactstrap';
   import ReactTooltip from "react-tooltip";
 
   import icon from './sml_icon.png'
@@ -77,30 +78,41 @@ function App() {
   const [context, setContext] = useState();
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen]   = useState(false);
+  const [darkModeChanged, setDarkModeChanged] = useState(false);
+
+
 
 
     useEffect(()=>{
+      
+   
       const unsub = onAuthStateChanged(getAuth(),user=>{
         setLoading(true);
         if (user) {
           console.log("signed in")
           auth.currentUser.getIdToken(true).then(async function(idToken) {
               let useridfromemail = await verifyUserAndEmail(idToken, user.email);
-              if(!useridfromemail.error)
-                setContext({firebaseuser: user, userid: useridfromemail.userid});
+              if(!useridfromemail.error){ 
+                  let darkModeBool = false;
+                  if(typeof JSON.parse(window.sessionStorage.getItem("darkmode")) == "boolean"){
+                    darkModeBool = JSON.parse(window.sessionStorage.getItem("darkmode"));
+                  }                
+                  setContext({firebaseuser: user, userid: useridfromemail.userid, darkmode: darkModeBool});
+              }
               setLoading(false);
             })
-          }
-          else {
+        }
+        else {
           console.log("signed out")
           setLoading(false);
-          }
-          console.log("Auth state changed");
+        }
+        console.log("Auth state changed");
           
       })
       
       return unsub;
-  },[])
+  },[darkModeChanged]);
+
 
  if(loading){
   
@@ -163,6 +175,16 @@ else if(!context?.userid) {
           <Nav className="ms-auto" navbar>
             <NavbarBrand>
              &#40; User: {context.userid}	&#41;
+             <Button onClick={() => { 
+                let darkModeBool = false;
+                if(typeof JSON.parse(window.sessionStorage.getItem("darkmode")) == "boolean"){
+                  darkModeBool = !JSON.parse(window.sessionStorage.getItem("darkmode"));
+                }      
+                window.sessionStorage.setItem("darkmode", darkModeBool);
+                setDarkModeChanged(!darkModeChanged);
+
+             }
+            }></Button>
              </NavbarBrand>
             <NavItem>
               <NavLink href="/" onClick={()=>

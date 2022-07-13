@@ -2,7 +2,7 @@ import React from "react";
 export const CurrentUserContext = React.createContext();
 
 
-
+// makes sure user token is valid and gets dark mode/
 export async function verifyUserAndEmail(token, email){
     if(email && email.trim().length){
       const payload = JSON.stringify({useremail: email.toLowerCase().trim(), usertoken: token});

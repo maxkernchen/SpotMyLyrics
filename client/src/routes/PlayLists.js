@@ -269,6 +269,8 @@ async refreshPlaylist(playlistid, playlistname)  {
    const toggle = () => this.setState({toggleDeleteDialog:!this.state.toggleDeleteDialog});
 
   
+   console.log(this.context);
+  
 
    if(this.state.callGetPlaylists){
      this.getExistingPlayListsSetState();
