@@ -134,7 +134,22 @@ getPlaylistSyncStatus(playlistdata){
     </>
   }
   else{
-    return "Last Synced: " + playlistdata.lastsynced;
+    let currentTime = new Date().getTime();
+    let playListSyncTime = new Date(playlistdata.lastsynced).getTime();
+
+    let minutesDiff = Math.ceil((currentTime - playListSyncTime)/ (1000 * 60));
+    let lastSyncTimeStr = minutesDiff + " Minute(s) ago";
+
+    if(minutesDiff > 59){
+      let hoursDiff = Math.ceil((currentTime - playListSyncTime)/ (1000 * 60 * 60));
+      lastSyncTimeStr = hoursDiff + " Hour(s) ago";
+        if(hoursDiff > 23){
+          let daysDiff = Math.ceil((currentTime - playListSyncTime)/ (1000 * 24 * 60 * 60));
+          lastSyncTimeStr = daysDiff + " Day(s) ago";
+        }
+    }
+    
+    return "Last Synced: " + lastSyncTimeStr
   }
 
 }
