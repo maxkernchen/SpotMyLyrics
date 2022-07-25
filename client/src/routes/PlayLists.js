@@ -293,7 +293,7 @@ async refreshPlaylist(playlistid, playlistname)  {
      this.setState({callGetPlaylists: false});
    }
 
-   if(playlistResults && allusersongsresults){
+   if(playlistResults && allusersongsresults && playlistResults.length > 0){
       console.log(playlistResults);
       
       existingPlayListList = playlistResults.map((pl) => 
@@ -366,6 +366,11 @@ async refreshPlaylist(playlistid, playlistname)  {
       
       
       );    
+    }
+    else{
+
+     existingPlayListList = <ListGroupItem key="no-playlists">No Playlists</ListGroupItem>
+   
     }
  
     return(

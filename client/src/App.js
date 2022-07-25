@@ -99,7 +99,8 @@ function App() {
                   else{
                     window.sessionStorage.setItem("darkmode", darkModeBool);
                   }                
-                  setContext({firebaseuser: user, userid: useridfromemail.userid, darkmode: darkModeBool});
+                  setContext({firebaseuser: user, userid: useridfromemail.userid, totalsongs: useridfromemail.totalsongs ? useridfromemail.totalsongs : 0,
+                              darkmode: darkModeBool});
               }
               setLoading(false);
             })

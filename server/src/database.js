@@ -78,10 +78,10 @@ export async function callUserExists(pool, userid){
   }  
 
   // func which calls stored proc to get the user id from an email input
-  export async function callGetUserIdFromEmail(pool, email){
-    let result;
-
-    const storedProcCall = 'CALL getuseridfromemail(?, @output);select @output;';
+  export async function callGetUserIdFromEmailAndTotalSongs(pool, email){
+    let result = {}
+ 
+    const storedProcCall = 'CALL getuseridandtotalsongs(?, @output, @output1);select @output, @output1;';
 
     let conn = await pool.promise().getConnection();
     if(conn){
@@ -91,7 +91,7 @@ export async function callUserExists(pool, userid){
       conn.connection.release();
 
       if(rows)
-        result = rows[1][0]['@output']; 
+        result = {userid: rows[1][0]['@output'], totalsongs: rows[1][0]['@output1']};
     }
     
     return result;

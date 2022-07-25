@@ -37,16 +37,27 @@ CREATE PROCEDURE emailexists (IN email VARCHAR(200), OUT foundemail TINYINT)
        END//
        
        
-CREATE PROCEDURE getuseridfromemail (IN email VARCHAR(200), OUT userid varchar(200))
+CREATE PROCEDURE getuseridandtotalsongs (IN email VARCHAR(200), OUT userid varchar(200), OUT totalsongsout int)
        BEGIN
-         SELECT smlusers.userid INTO userid FROM spotmylyricsdb.smlusers
+         SELECT distinct smlusers.userid INTO userid
+         FROM spotmylyricsdb.smlusers
          WHERE smlusers.email = email;
+    
+      
+	SELECT SUM(totalsongs) into totalsongsout from (
+		SELECT smlplaylist.totalsongs
+		 FROM smlplaylist
+		 LEFT JOIN smlusersongmapping ON smlusersongmapping.playlistid = smlplaylist.playlistid
+		 LEFT JOIN smlusers on smlusers.email = email
+		 group by smlplaylist.playlistid, smlplaylist.totalsongs)x;
+
        END//
        
-       
+
+
 CREATE PROCEDURE getlyricsforuser(IN userid VARCHAR(50), IN searchterm varchar(100))
        BEGIN
-         SELECT * FROM spotmylyricsdb.smluserlyrics
+         SELECT distinct artistname, songname, lyrics, albumart, smluserlyrics.url FROM spotmylyricsdb.smluserlyrics
          JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.userid = userid
          AND smluserlyrics.url = smlusersongmapping.url
          WHERE LOWER(smluserlyrics.lyrics) LIKE CONCAT('%', searchterm, '%');

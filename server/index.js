@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mysql from "mysql2";
-import {createDBPool, callEmailExists, callGetUserIdFromEmail, callGetLyricsForUser, 
+import {createDBPool, callEmailExists, callGetUserIdFromEmailAndTotalSongs, callGetLyricsForUser, 
   callGetUserPlaylists, callGetLyrics, callGetAllUserSongs, callUserExists, registeruser, deletePlaylistForUser} from "./src/database.js";
 import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
@@ -27,11 +27,12 @@ export function getConnectionPool() {
 app.post('/verifyuser', async function(req, res) {
  
   if(await callEmailExists(pool, req.body.useremail)){
-      let useridfromdb = await callGetUserIdFromEmail(pool, req.body.useremail);
+      let resultsUserIdFromEmail = await callGetUserIdFromEmailAndTotalSongs(pool, req.body.useremail);
       
       if(await verifyUserToken(req.body.usertoken)){
         res.send({
-          userid: useridfromdb
+          userid: resultsUserIdFromEmail.userid,
+          totalsongs: resultsUserIdFromEmail.totalsongs
         }); 
       }
       else{

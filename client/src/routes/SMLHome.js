@@ -187,7 +187,7 @@ export default class SMLHome extends React.Component {
       if(searchResults.length > 0){
         
         foundSongsList = searchResults.map((song) =>  <ListGroupItem key={song.songname}> 
-        <img className='album-art-search' src={song.albumarturl}/>  {song.songname} - {song.artistname} 
+        <img className="album-art-search" src={song.albumarturl}/>  {song.songname} - {song.artistname} 
         (<mark>{song.highlight.substring(0,searchTermLen)}</mark>{song.highlight.substring(searchTermLen, song.highlight.length + 1)}) - 
         <Link to={config.songlyricspathquery + new URLSearchParams({url: song.url}).toString()}> Full lyrics</Link>
         </ListGroupItem>);
@@ -218,7 +218,7 @@ export default class SMLHome extends React.Component {
       <div className="results-center">
         <h2>Search For Lyrics</h2>
         <InputGroup>
-          <Input onChange={this.handleInputChangeLyricSearch} placeholder="Search All Songs"/>
+          <Input onChange={this.handleInputChangeLyricSearch} placeholder= {"Search " + this.context?.totalsongs + " Songs"} />
         </InputGroup>
       
           <ListGroup flush>
