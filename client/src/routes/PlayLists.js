@@ -44,7 +44,7 @@ export default class PlayLists extends React.Component {
       callGetPlaylists: true,
       toastId: '',
       currentlyRefreshingPlaylist: '',
-      toggleDeleteDialog: false
+      toggleDeleteDialog: new Map()
     };
 
 
@@ -59,6 +59,7 @@ export default class PlayLists extends React.Component {
     let allPlaylists = this.state.existingPlaylists?.results;
     allPlaylists.forEach(pl => {
       this.state.collapsePlayListCard.set(pl.playlistid, false);
+      this.state.toggleDeleteDialog.set(pl.playlistid, false);
     });
 
   
@@ -273,7 +274,15 @@ async refreshPlaylist(playlistid, playlistname)  {
 
 }
 
+ toggleModal(playlistid){
+  
+  this.setState({
+  toggleDeleteDialog: update(this.state.toggleDeleteDialog, {[playlistid]: {$set: 
+    !this.state.toggleDeleteDialog.get(playlistid)}})
 
+  })
+
+}
   render() { 
 
    
@@ -281,9 +290,9 @@ async refreshPlaylist(playlistid, playlistname)  {
    let allusersongsresults = this.state.allUserSongs?.results;
    let existingPlayListList;
 
-   const toggle = () => this.setState({toggleDeleteDialog:!this.state.toggleDeleteDialog});
-
   
+
+
    console.log(this.context);
   
 
@@ -298,16 +307,17 @@ async refreshPlaylist(playlistid, playlistname)  {
       
       existingPlayListList = playlistResults.map((pl) => 
       <div className="list-div">
-        <Button outline color="danger" className="side-button" disabled={pl.currentlysyncing} onClick={() =>  this.setState({toggleDeleteDialog: true})}
-         data-tip data-for={pl.playlistid + "_delete"} >
+        <Button outline color="danger" className="side-button" disabled={pl.currentlysyncing} 
+                onClick={() => this.toggleModal(pl.playlistid)}
+                data-tip data-for={pl.playlistid + "_delete"} >
         <FontAwesomeIcon color ="red" icon="fa-solid fa-trash" /> 
             <ReactTooltip id={pl.playlistid + "_delete"}  place="bottom" effect="solid">
                 Delete Playlist
             </ReactTooltip>
         </Button>
 
-        <Modal isOpen={this.state.toggleDeleteDialog} toggle={toggle}>
-            <ModalHeader toggle={toggle}>
+        <Modal isOpen={this.state.toggleDeleteDialog.get(pl.playlistid)} toggle={()=>this.toggleModal(pl.playlistid)}>
+            <ModalHeader toggle={()=>this.toggleModal(pl.playlistid)}>
               Deleting {pl.playlistname}
             </ModalHeader>
             <ModalBody>
@@ -319,15 +329,16 @@ async refreshPlaylist(playlistid, playlistname)  {
                 onClick={() => this.deletePlaylist(pl.playlistid, this.context?.userid)}>
                 Delete Playlist
               </Button>
-              {' '}
-              <Button onClick={toggle}>
+            
+              <Button onClick={()=>this.toggleModal(pl.playlistid)}>
                 Cancel
               </Button>
             </ModalFooter>
           </Modal>
 
-        <Button outline color="success" className="side-button" disabled={pl.currentlysyncing} data-tip data-for={pl.playlistid + "_refresh"} 
-            onClick={() =>  this.refreshPlaylist(pl.playlistid, pl.playlistname)}>
+        <Button outline color="success" className="side-button" 
+                disabled={pl.currentlysyncing} data-tip data-for={pl.playlistid + "_refresh"} 
+                onClick={() =>  this.refreshPlaylist(pl.playlistid, pl.playlistname)}>
             <FontAwesomeIcon color ="green" icon="fa-solid fa-arrows-rotate" /> 
 
             <ReactTooltip id={pl.playlistid + "_refresh"}  place="bottom" effect="solid">
