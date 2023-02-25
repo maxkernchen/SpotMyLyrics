@@ -14,7 +14,7 @@ import 'firebase/compat/auth';
 import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
-import { faArrowRightFromBracket, faRotate, faWindowRestore } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faMoon, faRotate, faWindowRestore } from '@fortawesome/free-solid-svg-icons'
 import {
   Collapse,
   Navbar,
@@ -35,7 +35,7 @@ import {
 
 
 
-fontawesome.library.add(faArrowRightFromBracket, faRotate);
+fontawesome.library.add(faArrowRightFromBracket, faRotate, faMoon);
 
 const firebaseConfig = {
   apiKey: config.firebaseApiKey,
@@ -187,7 +187,11 @@ else if(!context?.userid) {
                 setDarkModeChanged(!darkModeChanged);
 
              }
-            }></Button>
+            }>  <FontAwesomeIcon data-tip data-for="darkmode-icon" icon="fa-solid fa-moon"/>
+              <ReactTooltip id="darkmode-icon" place="bottom" effect="solid">
+                Dark/Light Mode
+              </ReactTooltip>
+            </Button>
              </NavbarBrand>
             <NavItem>
               <NavLink href="/" onClick={()=>

@@ -213,8 +213,6 @@ export default class SMLHome extends React.Component {
         </InputGroup>
       </div>
       
-
-
       <div className="results-center">
         <h2>Search For Lyrics</h2>
         <InputGroup>
