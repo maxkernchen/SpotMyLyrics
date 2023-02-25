@@ -1,4 +1,4 @@
-import React , { useEffect,useState } from "react"
+import React , { useEffect, useState } from "react"
 import logo from './logo.svg';
 import './app.css';
 import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
@@ -14,7 +14,8 @@ import 'firebase/compat/auth';
 import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
-import { faArrowRightFromBracket, faMoon, faRotate, faWindowRestore } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faMoon as solidMoon, faRotate} from '@fortawesome/free-solid-svg-icons'
+import { faMoon as regularMoon} from '@fortawesome/free-regular-svg-icons'
 import {
   Collapse,
   Navbar,
@@ -35,7 +36,7 @@ import {
 
 
 
-fontawesome.library.add(faArrowRightFromBracket, faRotate, faMoon);
+fontawesome.library.add(faArrowRightFromBracket, faRotate, solidMoon, regularMoon);
 
 const firebaseConfig = {
   apiKey: config.firebaseApiKey,
@@ -73,12 +74,14 @@ function signOutFireBase(){
   });
 }
 
+var darkModeFAIcon = "fa-regular fa-moon";
 function App() {
 
   const [context, setContext] = useState();
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen]   = useState(false);
   const [darkModeChanged, setDarkModeChanged] = useState(false);
+  
 
 
     useEffect(()=>{
@@ -98,9 +101,11 @@ function App() {
                   // set session table if empty
                   else{
                     window.sessionStorage.setItem("darkmode", darkModeBool);
-                  }                
+                  }
+                  
                   setContext({firebaseuser: user, userid: useridfromemail.userid, totalsongs: useridfromemail.totalsongs ? useridfromemail.totalsongs : 0,
                               darkmode: darkModeBool});
+                              
               }
               setLoading(false);
             })
@@ -110,8 +115,15 @@ function App() {
           setLoading(false);
         }
         console.log("Auth state changed");
+        if(typeof JSON.parse(window.sessionStorage.getItem("darkmode")) == "boolean"){
+          let darkModeIconBool = JSON.parse(window.sessionStorage.getItem("darkmode"));
+          darkModeIconBool ? darkModeFAIcon = "fa-solid fa-moon" : darkModeFAIcon = "fa-regular fa-moon";
+        }
+        
           
       })
+
+     
       
       return unsub;
   },[darkModeChanged]);
@@ -187,7 +199,7 @@ else if(!context?.userid) {
                 setDarkModeChanged(!darkModeChanged);
 
              }
-            }>  <FontAwesomeIcon data-tip data-for="darkmode-icon" icon="fa-solid fa-moon"/>
+            }>  <FontAwesomeIcon data-tip data-for="darkmode-icon" icon={darkModeFAIcon}/>
               <ReactTooltip id="darkmode-icon" place="bottom" effect="solid">
                 Dark/Light Mode
               </ReactTooltip>
@@ -220,9 +232,7 @@ else if(!context?.userid) {
             <Redirect from="/" to="/spotmylyrics" />
           </Switch>
         </BrowserRouter>
-        </CurrentUserContext.Provider>
-
-        
+        </CurrentUserContext.Provider>      
       </div>
       
     );
