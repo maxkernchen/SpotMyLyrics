@@ -32,6 +32,8 @@ app.use(sessions({
             sameSite: 'lax'},
     resave: false 
 }));
+
+
 //app.use(cookieParser());
 initalizeSpotifyApi();
 
@@ -167,7 +169,9 @@ export function updatePlayListProgress(progressData){
 app.get('/playlistprogress', progessHandler);
 
 app.post('/setdarkmodecookie', (req, res) => {
-  req.session.darkmode = {};
+  if(req.session.darkmode === undefined){
+    req.session.darkmode = {};
+  }
   req.session.darkmode[req.body.username] = req.body.darkmodebool
   res.send({results: "Darkmode cookie saved for user " + req.body.username});
 });

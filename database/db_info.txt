@@ -47,8 +47,9 @@ CREATE PROCEDURE getuseridandtotalsongs (IN email VARCHAR(200), OUT userid varch
 	SELECT SUM(totalsongs) into totalsongsout from (
 		SELECT smlplaylist.totalsongs
 		 FROM smlplaylist
-		 LEFT JOIN smlusersongmapping ON smlusersongmapping.playlistid = smlplaylist.playlistid
-		 LEFT JOIN smlusers on smlusers.email = email
+		 JOIN smlusersongmapping ON smlusersongmapping.playlistid = smlplaylist.playlistid
+		 JOIN smlusers on smlusers.userid = smlusersongmapping.userid
+		 WHERE smlusers.email = email
 		 group by smlplaylist.playlistid, smlplaylist.totalsongs)x;
 
        END//
