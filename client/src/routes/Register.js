@@ -16,7 +16,7 @@ import {
 import firebase from 'firebase/compat/app';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import 'firebase/compat/auth';
-import { CurrentUserContext, verifyUserAndEmail } from "../CurrentUserContext";
+import { CurrentUserContext, verifyUserAndEmail } from "../CurrentUserContextAndCookies";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
@@ -150,7 +150,7 @@ export default class Register extends React.Component {
           body: payload
         })
           .then(data => data.json())
-      }
+    }
     
 
     createToast(message, iserror){

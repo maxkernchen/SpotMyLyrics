@@ -11,7 +11,7 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, signOut } from "firebase/auth";
 import 'firebase/compat/auth';
-import { CurrentUserContext, verifyUserAndEmail } from "./CurrentUserContext";
+import { CurrentUserContext, getDarkModeCookie, setDarkModeCookie, verifyUserAndEmail } from "./CurrentUserContextAndCookies";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
 import { faArrowRightFromBracket, faMoon as solidMoon, faRotate} from '@fortawesome/free-solid-svg-icons'
@@ -30,11 +30,7 @@ import {
   DropdownItem, 
   Button} from 'reactstrap';
   import ReactTooltip from "react-tooltip";
-
-  import icon from './sml_icon.png'
-
-
-
+  import icon from './sml_icon.png';
 
 fontawesome.library.add(faArrowRightFromBracket, faRotate, solidMoon, regularMoon);
 
@@ -92,19 +88,21 @@ function App() {
         if (user) {
           console.log("signed in")
           auth.currentUser.getIdToken(true).then(async function(idToken) {
+          
               let useridfromemail = await verifyUserAndEmail(idToken, user.email);
               if(!useridfromemail.error){ 
                   let darkModeBool = false;
-                  if(typeof JSON.parse(window.sessionStorage.getItem("darkmode")) == "boolean"){
-                    darkModeBool = JSON.parse(window.sessionStorage.getItem("darkmode"));
+                  // TODO make this cookie that persits on tab close
+                  let cookieResults = await getDarkModeCookie(useridfromemail.userid);
+                  if(!cookieResults.error){
+                    darkModeBool = cookieResults.results;
                   }
-                  // set session table if empty
                   else{
-                    window.sessionStorage.setItem("darkmode", darkModeBool);
+                    await setDarkModeCookie(useridfromemail.userid, darkModeBool);
                   }
-                  
                   setContext({firebaseuser: user, userid: useridfromemail.userid, totalsongs: useridfromemail.totalsongs ? useridfromemail.totalsongs : 0,
                               darkmode: darkModeBool});
+                      darkModeBool ? darkModeFAIcon = "fa-solid fa-moon" : darkModeFAIcon = "fa-regular fa-moon";
                               
               }
               setLoading(false);
@@ -115,12 +113,10 @@ function App() {
           setLoading(false);
         }
         console.log("Auth state changed");
-        if(typeof JSON.parse(window.sessionStorage.getItem("darkmode")) == "boolean"){
-          let darkModeIconBool = JSON.parse(window.sessionStorage.getItem("darkmode"));
-          darkModeIconBool ? darkModeFAIcon = "fa-solid fa-moon" : darkModeFAIcon = "fa-regular fa-moon";
-        }
+    
         
-          
+        
+    
       })
 
      
@@ -190,14 +186,15 @@ else if(!context?.userid) {
           <Nav className="ms-auto" navbar>
             <NavbarBrand>
              &#40; User: {context.userid}	&#41;
-             <Button onClick={() => { 
+             <Button onClick={async () => { 
+              
                 let darkModeBool = false;
-                if(typeof JSON.parse(window.sessionStorage.getItem("darkmode")) == "boolean"){
-                  darkModeBool = !JSON.parse(window.sessionStorage.getItem("darkmode"));
-                }      
-                window.sessionStorage.setItem("darkmode", darkModeBool);
+                let cookieResults = await getDarkModeCookie(context.userid);
+                if(!cookieResults.error){
+                  darkModeBool = cookieResults.results;
+                }
+                await setDarkModeCookie(context.userid, !darkModeBool);
                 setDarkModeChanged(!darkModeChanged);
-
              }
             }>  <FontAwesomeIcon data-tip data-for="darkmode-icon" icon={darkModeFAIcon}/>
               <ReactTooltip id="darkmode-icon" place="bottom" effect="solid">

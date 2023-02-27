@@ -16,7 +16,7 @@ import {
   UncontrolledCollapse,
   Button, Input, ListGroup, ListGroupItem
 , Modal, ModalBody, ModalHeader,ModalFooter} from 'reactstrap';
-import { CurrentUserContext } from "../CurrentUserContext";
+import { CurrentUserContext } from "../CurrentUserContextAndCookies";
 import { Link } from 'react-router-dom';
 import './playlists.css'
 import { toast } from 'react-toastify';

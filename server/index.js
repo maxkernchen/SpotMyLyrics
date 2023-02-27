@@ -1,11 +1,15 @@
 import express from "express";
 import cors from "cors";
 import mysql from "mysql2";
+//import cookieParser from "cookie-parser";
+import sessions from "express-session"
 import {createDBPool, callEmailExists, callGetUserIdFromEmailAndTotalSongs, callGetLyricsForUser, 
   callGetUserPlaylists, callGetLyrics, callGetAllUserSongs, callUserExists, registeruser, deletePlaylistForUser} from "./src/database.js";
 import { scheduleLyricTask } from "./src/worker/lyricFindWorker.js";
 import { initalizeSpotifyApi } from "./src/api/spotifyApiCaller.js";
 import { verifyUserToken, deleteUser } from "./src/auth.js";
+import {config} from "./src/config/config.js";
+
 
 
 const app = express();
@@ -13,9 +17,22 @@ const PORT = process.env.PORT || 3001;
 
 const pool = createDBPool(mysql);
 
-app.use(cors());
+//app.use(cors());
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 app.use(express.urlencoded());
 app.use(express.json());
+
+
+app.use(sessions({
+    secret: config.sessionKey,
+    saveUninitialized: false,
+    cookie: { maxAge: config.twoWeeksAge, 
+            secure: false,
+            httpOnly: false,
+            sameSite: 'lax'},
+    resave: false 
+}));
+//app.use(cookieParser());
 initalizeSpotifyApi();
 
 let clients = [];
@@ -148,6 +165,22 @@ export function updatePlayListProgress(progressData){
 }
 
 app.get('/playlistprogress', progessHandler);
+
+app.post('/setdarkmodecookie', (req, res) => {
+  req.session.darkmode = {};
+  req.session.darkmode[req.body.username] = req.body.darkmodebool
+  res.send({results: "Darkmode cookie saved for user " + req.body.username});
+});
+
+app.post('/getdarkmodecookie', (req, res) => {
+  if(!req.session.darkmode || req.session.darkmode[req.body.username] === undefined){
+    res.send({error: "Darkmode cookie not found"});
+  }
+  else{
+    res.send({results : req.session.darkmode[req.body.username]})
+  }
+  
+});
 
 
 app.listen(PORT, () => {
