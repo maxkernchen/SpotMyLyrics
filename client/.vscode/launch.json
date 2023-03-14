@@ -1,19 +1,18 @@
 {
     "configurations": [
     {
-        "name": "Launch Chrome",
-        "request": "launch",
-        "type": "pwa-chrome",
-        "url": "http://localhost:3000",
-        "webRoot": "${workspaceFolder}",
-        "runtimeExecutable": "/snap/bin/chromium",
-      "runtimeArgs": [
-      "--new-window",
-      "-user-data-dir=/${workspaceFolder}/DevProfile",
-      "--remote-debugging-port=9222",
-     
-    
-    ]   
+      "type": "firefox",
+      "request": "launch",
+      "name": "Launch My Firefox",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "timeout": 90000,
+      "tmpDir": "~/Documents/temp_firefox_debug/",
+      "pathMappings": [{
+        "url": "http://localhost",
+        "path": "${workspaceFolder}"
+    }]
 }
     ]
 }
+
