@@ -1,0 +1,56 @@
+:root {
+    --green: #4cb474;
+  }
+  .firebaseui-textfield.mdl-textfield .firebaseui-label::after{
+    background-color: var(--green) !important;
+  }
+  /* this is the sign in box*/
+.firebaseui-container {
+    background: white!important; 
+    margin-bottom: 15px;
+    min-height: 150px;
+    padding-top: 10px;
+    border-radius: 20px;
+    box-shadow: none;
+   
+  }
+  /* text color for sign in */
+  .firebaseui-input{
+    color: black !important;
+  }
+  .firebaseui-container.firebaseui-page-provider-sign-in {
+    background: transparent;
+    box-shadow: none;
+    min-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+  }
+  .firebaseui-container.firebaseui-id-page-callback {
+    background: transparent;
+    box-shadow: none;
+    margin-top: 40px;
+    height: 84px;
+    min-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+  }
+  .firebaseui-card-header {
+    display: none;
+  }
+  .firebaseui-subtitle, .firebaseui-text {
+    color: var(--green);
+  }
+  .firebaseui-form-actions .mdl-button--raised.mdl-button--colored.firebaseui-button {
+    background: var(--green);
+  }
+  .firebaseui-id-dismiss-info-bar {
+    display: block;
+  }
+  .firebaseui-info-bar {
+    border: 0;
+    border-radius: 10px;
+    left: 5%;
+    right: 5%;
+    top: 10%;
+    bottom: 10%;
+  }

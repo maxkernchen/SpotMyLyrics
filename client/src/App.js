@@ -15,6 +15,7 @@ import { CurrentUserContext, getDarkModeCookie, setDarkModeCookie, verifyUserAnd
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
 import { faArrowRightFromBracket, faMoon as solidMoon, faRotate} from '@fortawesome/free-solid-svg-icons'
+import './firebaseui-styling.global.css';
 import { faMoon as regularMoon} from '@fortawesome/free-regular-svg-icons'
 import {
   Collapse,
@@ -145,9 +146,14 @@ else if(!context?.userid) {
             <Route path="/register">
               <Register />
             </Route>
+            
             <Route path="/login">
+              <br/>
+              <br/>
               <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
-              <a href="/register">register link</a>
+              <Button href="/register"> 
+               register link
+              </Button>
             </Route>
             <Redirect from="/" to="/login" />
           </Switch>
