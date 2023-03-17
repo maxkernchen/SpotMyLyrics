@@ -242,7 +242,7 @@ export default class Register extends React.Component {
 
          <br/>
          <Link to="/login">
-            <Button outline color="info">Login</Button>
+            <Button outline color="success">Login</Button>
          </Link>
          &nbsp;
          &nbsp;

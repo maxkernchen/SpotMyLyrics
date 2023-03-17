@@ -151,8 +151,10 @@ else if(!context?.userid) {
               <br/>
               <br/>
               <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
-              <Button href="/register"> 
-               register link
+              <br/>
+              <br/>
+              <Button outline color="success" className="centered" href="/register"> 
+               Register
               </Button>
             </Route>
             <Redirect from="/" to="/login" />

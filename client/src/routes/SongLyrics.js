@@ -68,6 +68,7 @@ export default class SongLyrics extends React.Component {
     return(
 
        <>
+       <br/>
         <img className="album-art-lyrics" src={this.state.fullSongLyrics.results?.albumarturl}></img>
         <br/>
         <h2 className="lyrics">
