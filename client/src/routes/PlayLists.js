@@ -356,13 +356,13 @@ async refreshPlaylist(playlistid, playlistname)  {
       {pl.songswithlyrics + pl.songswithoutlyrics} {this.getPlaylistSyncStatus.call(this, pl)} 
       
       <Collapse isOpen={this.state.collapsePlayListCard.get(pl.playlistid)}>
-        <Card>
-          <CardBody>
+        <Card color='dark'>
+          <CardBody color='dark'>
           <ListGroup flush className="playlist-list">
               {allusersongsresults.map((song) => {
 
                   if(song.playlistid === pl.playlistid){
-                    return <ListGroupItem key={song.songname} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
+                    return <ListGroupItem className={this.context.darkmode ? "list-group-dark" : ""} key={song.songname} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
                               &nbsp; {song.artistname} - {song.songname} &nbsp; {this.getSongSyncStatus.call(this, song)}
                           </ListGroupItem>
                   }

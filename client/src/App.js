@@ -144,7 +144,7 @@ else if(!context?.userid) {
       return (<div>
     
     <CurrentUserContext.Provider value={context}>
-      <Navbar color="light" light expand="md">
+      <Navbar color={context.darkmode ? "dark" : "light"} light expand="md">
       <NavbarBrand href="/">Spot My Lyrics </NavbarBrand>
       </Navbar>
       <BrowserRouter>
@@ -178,7 +178,7 @@ else if(!context?.userid) {
       <div>
        
         <CurrentUserContext.Provider value={context}>
-        <Navbar color="light" light expand="md">
+        <Navbar color={context.darkmode ? "dark" : "light"} light={context.darkmode ? "" : "light"} expand="md">
         <NavbarBrand href="/" data-tip data-for="home-link"><img className="home-icon" src={icon}/> 
             Spot My Lyrics 
           <ReactTooltip id="home-link" place="bottom" effect="solid">
@@ -199,7 +199,7 @@ else if(!context?.userid) {
           </Nav>
           <Nav className="ms-auto" navbar>
             <NavbarBrand>
-             &#40; User: {context.userid}	&#41;
+             &#40; User: {context.userid}	&#41; &#160;
              <Button onClick={async () => { 
               
                 let darkModeBool = false;

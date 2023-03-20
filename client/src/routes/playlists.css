@@ -1,3 +1,7 @@
+:root {
+    --dark-theme-color: rgb(48, 46, 46);
+  }
+
 .playlist-list{
     text-align: center;
     margin-top: 1rem;
@@ -23,3 +27,8 @@
     height: 3rem;
     margin: .2rem;
 }
+.list-group-dark {
+    background-color: var(--dark-theme-color);
+    color: whitesmoke;
+ 
+  }
