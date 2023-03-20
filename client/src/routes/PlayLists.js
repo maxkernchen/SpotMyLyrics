@@ -345,7 +345,8 @@ async refreshPlaylist(playlistid, playlistname)  {
                 Refresh Playlist
             </ReactTooltip>
         </Button>
-        <Button className="list-group-item list-group-item-action" 
+        <Button className={this.context.darkmode ? 
+            "list-dark list-group-item list-group-item-action" : "list-group-item list-group-item-action"} 
        key={pl.playlistname} onClick={ () =>
         this.setState({
           collapsePlayListCard: update(this.state.collapsePlayListCard, {[pl.playlistid]: {$set: 
@@ -356,13 +357,13 @@ async refreshPlaylist(playlistid, playlistname)  {
       {pl.songswithlyrics + pl.songswithoutlyrics} {this.getPlaylistSyncStatus.call(this, pl)} 
       
       <Collapse isOpen={this.state.collapsePlayListCard.get(pl.playlistid)}>
-        <Card color='dark'>
-          <CardBody color='dark'>
+        <Card className={this.context.darkmode ? "list-dark" : ""}>
+          <CardBody >
           <ListGroup flush className="playlist-list">
               {allusersongsresults.map((song) => {
 
                   if(song.playlistid === pl.playlistid){
-                    return <ListGroupItem className={this.context.darkmode ? "list-group-dark" : ""} key={song.songname} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
+                    return <ListGroupItem className={this.context.darkmode ? "list-dark" : ""} key={song.songname} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
                               &nbsp; {song.artistname} - {song.songname} &nbsp; {this.getSongSyncStatus.call(this, song)}
                           </ListGroupItem>
                   }

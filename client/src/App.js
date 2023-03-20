@@ -135,9 +135,11 @@ function App() {
  if(loading){
   
     return(
-    <div className="loading-div">
-    <FontAwesomeIcon className="centered" icon="fa-solid fa-rotate" size="5x" spin={true}/>
-    </div>);
+    <CurrentUserContext.Provider value={context}>
+      <div className="loading-div">
+        <FontAwesomeIcon className={context?.darkmode ? "dark-theme centered" : "centered"} icon="fa-solid fa-rotate" size="5x" spin={true}/>
+      </div>
+    </CurrentUserContext.Provider>);
   
  }
 else if(!context?.userid) {
