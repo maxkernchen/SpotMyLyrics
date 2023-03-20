@@ -101,6 +101,12 @@ function App() {
                   else{
                     await setDarkModeCookie(useridfromemail.userid, darkModeBool);
                   }
+                  if(darkModeBool){
+                    document.body.classList.add('dark-theme');
+                  }
+                  else{
+                    document.body.classList.remove('dark-theme');
+                  }
                   setContext({firebaseuser: user, userid: useridfromemail.userid, totalsongs: useridfromemail.totalsongs ? useridfromemail.totalsongs : 0,
                               darkmode: darkModeBool});
                       darkModeBool ? darkModeFAIcon = "fa-solid fa-moon" : darkModeFAIcon = "fa-regular fa-moon";
