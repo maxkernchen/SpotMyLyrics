@@ -105,10 +105,9 @@ export default class SMLHome extends React.Component {
         pauseOnHover: true,
         draggable: false,
         progress: undefined,
+        theme: this.context.darkmode ? "dark" : "light"
         });
     }
-
-    
 
   }
 
@@ -122,6 +121,7 @@ export default class SMLHome extends React.Component {
         pauseOnHover: false,
         draggable: false,
         progress: 0,
+        theme: this.context.darkmode ? "dark" : "light"
         });
 
       this.setState({toastId: toastIdCreated});

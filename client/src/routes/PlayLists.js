@@ -185,7 +185,8 @@ createToast(message, iserror, isplaylist){
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: false,
-      draggable: false
+      draggable: false,
+      theme: this.context.darkmode ? "dark" : "light"
       });
   }
   else if (isplaylist){
@@ -198,6 +199,7 @@ createToast(message, iserror, isplaylist){
       pauseOnHover: false,
       draggable: false,
       progress: 0,
+      theme: this.context.darkmode ? "dark" : "light"
       });
       // only store toast id for playlist re-sync
    
@@ -211,7 +213,8 @@ createToast(message, iserror, isplaylist){
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: false,
-      draggable: false
+      draggable: false,
+      theme: this.context.darkmode ? "dark" : "light"
       });
   }
 }
@@ -289,9 +292,6 @@ async refreshPlaylist(playlistid, playlistname)  {
    let playlistResults = this.state.existingPlaylists?.results;
    let allusersongsresults = this.state.allUserSongs?.results;
    let existingPlayListList;
-
-  
-
 
    console.log(this.context);
    if(this.context.darkmode){

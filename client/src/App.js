@@ -119,13 +119,7 @@ function App() {
           console.log("signed out")
           setLoading(false);
         }
-        console.log("Auth state changed");
-    
-        
-        
-    
       })
-      console.log("useffect");
 
       return unsub;
   },[darkModeChanged]);
@@ -144,7 +138,7 @@ else if(!context?.userid) {
       return (<div>
     
     <CurrentUserContext.Provider value={context}>
-      <Navbar color={context?.darkmode ? "dark" : "light"} light expand="md">
+      <Navbar color={context?.darkmode ? "dark" : "light"} expand="md">
       <NavbarBrand href="/">Spot My Lyrics </NavbarBrand>
       </Navbar>
       <BrowserRouter>
@@ -167,8 +161,6 @@ else if(!context?.userid) {
           </Switch>
         </BrowserRouter>
       </CurrentUserContext.Provider>
-
-       
     </div>);
 
   }
@@ -178,7 +170,7 @@ else if(!context?.userid) {
       <div>
        
         <CurrentUserContext.Provider value={context}>
-        <Navbar color={context?.darkmode ? "dark" : "light"} light={context?.darkmode ? "" : "light"} expand="md">
+        <Navbar color={context?.darkmode ? "dark" : "light"} expand="md">
         <NavbarBrand href="/" data-tip data-for="home-link"><img className="home-icon" src={icon}/> 
             Spot My Lyrics 
           <ReactTooltip id="home-link" place="bottom" effect="solid">

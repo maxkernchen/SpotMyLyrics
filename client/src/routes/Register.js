@@ -161,7 +161,7 @@ export default class Register extends React.Component {
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: false,
-          draggable: false
+          draggable: false,
           });
       }
       else{
@@ -175,12 +175,7 @@ export default class Register extends React.Component {
           });
 
       }
-  
-      
-  
     }
-
-
     async deleteuserFireBase(uid){
 
         const payload = JSON.stringify({uid: uid});
@@ -195,7 +190,6 @@ export default class Register extends React.Component {
     }
     
   
-
     render() { 
         return <div className='register-container'>
           <InputGroup>
