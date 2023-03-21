@@ -1,12 +1,13 @@
+:root {
+    --dark-theme-color: rgb(48, 46, 46);
+    --green-dark: rgb(74, 138, 48);
+  }
+
 .home-center{
     text-align: center;
     margin-left: 10%;
     margin-right: 10%;
-
-
-
 }
-
 .results-center{
     text-align: center;
     margin-left: 25%;
@@ -19,5 +20,20 @@
     border-radius: 50%;
     width: 3rem;
     height: 3rem;
+}
+.dark-list-results{
+    background-color: var(--dark-theme-color) !important;
+    color: whitesmoke !important;
+    border: 1px solid whitesmoke !important;
+    border-bottom-left-radius: 20px!important;
+    border-bottom-right-radius: 20px!important;
+    border-top-left-radius: 20px!important;
+    border-top-right-radius: 20px!important;
+}
+
+.list-results {  
+
+    border-bottom-left-radius: 20px!important;
+    border-bottom-right-radius: 20px!important;
 }
 

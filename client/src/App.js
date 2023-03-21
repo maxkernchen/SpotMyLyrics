@@ -78,16 +78,14 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen]   = useState(false);
   const [darkModeChanged, setDarkModeChanged] = useState(false);
-  
-
 
     useEffect(()=>{
-      
-   
+  
       const unsub = onAuthStateChanged(getAuth(),user=>{
-        setLoading(true);
+     
         if (user) {
           console.log("signed in")
+          setLoading(true);
           auth.currentUser.getIdToken(true).then(async function(idToken) {
           
               let useridfromemail = await verifyUserAndEmail(idToken, user.email);
@@ -107,9 +105,11 @@ function App() {
                   else{
                     document.body.classList.remove('dark-theme');
                   }
+                  
                   setContext({firebaseuser: user, userid: useridfromemail.userid, totalsongs: useridfromemail.totalsongs ? useridfromemail.totalsongs : 0,
                               darkmode: darkModeBool});
                       darkModeBool ? darkModeFAIcon = "fa-solid fa-moon" : darkModeFAIcon = "fa-regular fa-moon";
+                      
                               
               }
               setLoading(false);
@@ -125,28 +125,26 @@ function App() {
         
     
       })
+      console.log("useffect");
 
-     
-      
       return unsub;
   },[darkModeChanged]);
 
 
  if(loading){
-  
+ 
     return(
-    <CurrentUserContext.Provider value={context}>
       <div className="loading-div">
-        <FontAwesomeIcon className={context?.darkmode ? "dark-theme centered" : "centered"} icon="fa-solid fa-rotate" size="5x" spin={true}/>
+        <FontAwesomeIcon className="centered" icon="fa-solid fa-rotate" size="5x" spin={true}/>
       </div>
-    </CurrentUserContext.Provider>);
+    )
   
  }
 else if(!context?.userid) {
       return (<div>
     
     <CurrentUserContext.Provider value={context}>
-      <Navbar color={context.darkmode ? "dark" : "light"} light expand="md">
+      <Navbar color={context?.darkmode ? "dark" : "light"} light expand="md">
       <NavbarBrand href="/">Spot My Lyrics </NavbarBrand>
       </Navbar>
       <BrowserRouter>
@@ -180,7 +178,7 @@ else if(!context?.userid) {
       <div>
        
         <CurrentUserContext.Provider value={context}>
-        <Navbar color={context.darkmode ? "dark" : "light"} light={context.darkmode ? "" : "light"} expand="md">
+        <Navbar color={context?.darkmode ? "dark" : "light"} light={context?.darkmode ? "" : "light"} expand="md">
         <NavbarBrand href="/" data-tip data-for="home-link"><img className="home-icon" src={icon}/> 
             Spot My Lyrics 
           <ReactTooltip id="home-link" place="bottom" effect="solid">

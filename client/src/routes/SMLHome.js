@@ -186,7 +186,8 @@ export default class SMLHome extends React.Component {
      
       if(searchResults.length > 0){
         
-        foundSongsList = searchResults.map((song) =>  <ListGroupItem key={song.songname}> 
+        foundSongsList = searchResults.map((song) =>  <ListGroupItem 
+        className={this.context.darkmode ? "dark-list-results": "list-result"} key={song.songname}> 
         <img className="album-art-search" src={song.albumarturl}/>  {song.songname} - {song.artistname} 
         (<mark>{song.highlight.substring(0,searchTermLen)}</mark>{song.highlight.substring(searchTermLen, song.highlight.length + 1)}) - 
         <Link to={config.songlyricspathquery + new URLSearchParams({url: song.url}).toString()}> Full lyrics</Link>
@@ -207,8 +208,8 @@ export default class SMLHome extends React.Component {
             <Input onChange={e => this.setState({
             playList: e.target.value
             })}/>
-
-            <Button color="success" onClick={() => this.addPlayListClick()} >Add Playlist</Button>
+            &#160;
+            <Button outline color="success" onClick={() => this.addPlayListClick()} >Add Playlist</Button>
           
         </InputGroup>
       </div>

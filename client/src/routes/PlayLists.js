@@ -294,7 +294,13 @@ async refreshPlaylist(playlistid, playlistname)  {
 
 
    console.log(this.context);
-  
+   if(this.context.darkmode){
+    document.body.classList.add('dark-theme');
+    }
+    else{
+      document.body.classList.remove('dark-theme');
+    }
+    
 
    if(this.state.callGetPlaylists){
      this.getExistingPlayListsSetState();
