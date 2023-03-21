@@ -323,13 +323,13 @@ async refreshPlaylist(playlistid, playlistname)  {
         </Button>
 
         <Modal isOpen={this.state.toggleDeleteDialog.get(pl.playlistid)} toggle={()=>this.toggleModal(pl.playlistid)}>
-            <ModalHeader toggle={()=>this.toggleModal(pl.playlistid)}>
+            <ModalHeader className={this.context.darkmode ? "modal-dark": ""} toggle={()=>this.toggleModal(pl.playlistid)}>
               Deleting {pl.playlistname}
             </ModalHeader>
-            <ModalBody>
+            <ModalBody className={this.context.darkmode ? "modal-dark": ""}>
               Are you sure you want to delete PlayList: "{pl.playlistname}"
             </ModalBody>
-            <ModalFooter>
+            <ModalFooter className={this.context.darkmode ? "modal-dark": ""}>
               <Button
                 color="danger"
                 onClick={() => this.deletePlaylist(pl.playlistid, this.context?.userid)}>

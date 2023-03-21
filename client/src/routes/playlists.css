@@ -27,8 +27,11 @@
     height: 3rem;
     margin: .2rem;
 }
-.list-dark {
+.list-dark{
     background-color: var(--dark-theme-color) !important;
     color: whitesmoke !important;
- 
-  }
+}
+.modal-dark {
+    background-color: var(--dark-theme-color) !important;
+    color: whitesmoke !important;
+}
