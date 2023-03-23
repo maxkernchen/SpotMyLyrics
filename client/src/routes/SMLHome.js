@@ -113,7 +113,7 @@ export default class SMLHome extends React.Component {
 
   createToast(playListName){
     if(!this.state.toastId){
-      let toastIdCreated = toast.loading('Playlist Scheduled ' + playListName, {
+      let toastIdCreated = toast.loading('Processing Playlist ' + playListName, {
         position: "bottom-right",
         autoClose: false,
         hideProgressBar: false,
