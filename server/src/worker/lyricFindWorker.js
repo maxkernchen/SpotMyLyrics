@@ -186,7 +186,7 @@ async function findLyricsMusixMatch(artistName, songName) {
     if(!lyrics){
         let songArtistStr = artistName + ' ' + songName;
         let fullURl = baseMusixMatchSearchUrl + songArtistStr.replace(/\s/g, '%20') + '/tracks';
-        await new Promise(r => setTimeout(r, 5000));
+        await new Promise(r => setTimeout(r, Math.floor(Math.random() * 10000) + 3000));
         const response = await got(fullURl);
         let $ = await Cheerio.load(response.body);
         let firstSearchLink = $('h2.media-card-title').children();

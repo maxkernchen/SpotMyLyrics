@@ -369,7 +369,7 @@ async refreshPlaylist(playlistid, playlistname)  {
               {allusersongsresults.map((song) => {
 
                   if(song.playlistid === pl.playlistid){
-                    return <ListGroupItem className={this.context.darkmode ? "list-dark" : ""} key={song.songname} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
+                    return <ListGroupItem className={this.context.darkmode ? "list-dark" : ""} key={song.url} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
                               &nbsp; {song.artistname} - {song.songname} &nbsp; {this.getSongSyncStatus.call(this, song)}
                           </ListGroupItem>
                   }
