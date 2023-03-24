@@ -204,7 +204,6 @@ async function findLyricsMusixMatch(artistName, songName) {
           const page = await browser.newPage()
           await page.goto(fullURl);
           const content = await page.content(); 
-          await page.waitForTimeout(5000)
           await browser.close()
           pageBody = content;
         })
@@ -249,7 +248,6 @@ async function getLyricsFromUrl(songUrl, artistName, attempts){
               const page = await browser.newPage()
               await page.goto(songUrl);
               const content = await page.content(); 
-              await page.waitForTimeout(5000)
               await browser.close()
               responseLyrics = content;
             })
