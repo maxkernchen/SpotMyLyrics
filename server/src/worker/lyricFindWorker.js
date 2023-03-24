@@ -2,6 +2,13 @@ import Bull from 'bull';
 import { getCurrentApiObj } from '../api/spotifyApiCaller.js';
 import * as Cheerio from 'cheerio';
 import got from 'got';
+import puppeteer from 'puppeteer-extra'
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+
+
+// add stealth plugin and use defaults (all evasion techniques)
+
+
 import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
 import { updatePlayListProgress } from '../../index.js';
 import { Job } from 'bull';
@@ -22,6 +29,8 @@ await queueJob.clean(0, 'completed');
 await queueJob.clean(0, 'delayed');
 await queueJob.clean(0, 'failed');
 await queueJob.obliterate({ force: true })
+
+
 
 // allow two maximum jobs at once, but no user may submit more than one job at a time.
 // Two users may run two jobs concurrently 
@@ -186,9 +195,21 @@ async function findLyricsMusixMatch(artistName, songName) {
     if(!lyrics){
         let songArtistStr = artistName + ' ' + songName;
         let fullURl = baseMusixMatchSearchUrl + songArtistStr.replace(/\s/g, '%20') + '/tracks';
-        await new Promise(r => setTimeout(r, Math.floor(Math.random() * 10000) + 3000));
-        const response = await got(fullURl);
-        let $ = await Cheerio.load(response.body);
+       // await new Promise(r => setTimeout(r, Math.floor(Math.random() * 10000) + 3000));
+        let pageBody;
+        await puppeteer
+        .use(StealthPlugin())
+        .launch({ headless: true })
+        .then(async browser => {
+          const page = await browser.newPage()
+          await page.goto(fullURl);
+          const content = await page.content(); 
+          await page.waitForTimeout(5000)
+          await browser.close()
+          pageBody = content;
+        })
+        //const response = await got(fullURl);
+        let $ = await Cheerio.load(pageBody);
         let firstSearchLink = $('h2.media-card-title').children();
 
         if(firstSearchLink && firstSearchLink.length > 0){
@@ -217,18 +238,32 @@ async function getLyricsFromUrl(songUrl, artistName, attempts){
     let artistMatches = false;
     let $;
     do{
-        await new Promise(r => setTimeout(r, 5000));
+       // await new Promise(r => setTimeout(r, 5000));
         let responseLyrics;
         try {
-            responseLyrics = await got(songUrl);
+            
+            await puppeteer
+            .use(StealthPlugin())
+            .launch({ headless: true })
+            .then(async browser => {
+              const page = await browser.newPage()
+              await page.goto(songUrl);
+              const content = await page.content(); 
+              await page.waitForTimeout(5000)
+              await browser.close()
+              responseLyrics = content;
+            })
         }
         catch(error){
             return lyrics;
         }
-        $ = await Cheerio.load(responseLyrics.body);
+        $ = await Cheerio.load(responseLyrics);
         
         let artistNameFromPage = $('title');
-        let artistNameTitle = artistNameFromPage[0].children[0].data;
+        let artistNameTitle = artistNameFromPage[0].children[0]?.data;
+        if(!artistNameTitle){
+            return lyrics;
+        }
         // make sure artist name matches the page we are on.
         // musixmatch seems to redirect to random pages for bot prevention
         artistMatches = artistNameTitle.toLowerCase().includes(artistName.toLowerCase());
