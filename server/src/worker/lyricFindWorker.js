@@ -109,6 +109,8 @@ async function lyricWork(job) {
     console.log(playlistName);
     let currentUser = workerData.currentUserName;
     let playListID = workerData.lyricJobPlayListID;
+    // remove any podcasts in a playlist
+    playListTracks = playListTracks.filter(removePodcasts);
      // dont load any duplicate songs, spotify allows playlists to have duplicate songs.
     playListTracks = playListTracks.filter(removeDuplicateTracks);
     let totalsongs = playListTracks.length;
@@ -126,7 +128,6 @@ async function lyricWork(job) {
         let albumArt = track.track.album.images[0].url;;
               
         console.log('fetching lyrics from web!');
-        
         // TODO if song exists already in DB dont fetch from musix
         let lyrics = await findLyricsMusixMatch(artistName, songName);
         console.log('inserting lyrics into db!');
@@ -195,7 +196,6 @@ async function findLyricsMusixMatch(artistName, songName) {
     if(!lyrics){
         let songArtistStr = artistName + ' ' + songName;
         let fullURl = baseMusixMatchSearchUrl + songArtistStr.replace(/\s/g, '%20') + '/tracks';
-       // await new Promise(r => setTimeout(r, Math.floor(Math.random() * 10000) + 3000));
         let pageBody;
         await puppeteer
         .use(StealthPlugin())
@@ -230,6 +230,9 @@ function removeDuplicateTracks(track, index, array) {
     return index === array.findIndex(t => (
         t.track.external_urls.spotify === track.track.external_urls.spotify));
 
+}
+function removePodcasts(track) {
+  return track.track !== null;
 }
 
 async function getLyricsFromUrl(songUrl, artistName, attempts){
