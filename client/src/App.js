@@ -1,7 +1,6 @@
 import React , { useEffect, useState } from "react"
-import logo from './logo.svg';
 import './app.css';
-import { BrowserRouter, Route, Switch, Link, Redirect} from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import SMLHome from "./routes/SMLHome";
 import PlayLists from "./routes/PlayLists"
 import SongLyrics from "./routes/SongLyrics";
@@ -9,7 +8,7 @@ import Register from "./routes/Register";
 import {config} from "./config.js";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, signOut } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import 'firebase/compat/auth';
 import { CurrentUserContext, getDarkModeCookie, setDarkModeCookie, verifyUserAndEmail } from "./CurrentUserContextAndCookies";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -25,10 +24,6 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Tooltip,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem, 
   Button} from 'reactstrap';
   import ReactTooltip from "react-tooltip";
   import icon from './sml_icon.png';
@@ -139,7 +134,7 @@ else if(!context?.userid) {
     
     <CurrentUserContext.Provider value={context}>
       <Navbar color={context?.darkmode ? "dark" : "light"} expand="md">
-      <NavbarBrand href="/"><img className="home-icon" src={icon}/>&#160;Spot My Lyrics</NavbarBrand>
+      <NavbarBrand href="/"><img className="home-icon" src={icon} alt="Spot My Lyrics Logo"/>&#160;Spot My Lyrics</NavbarBrand>
       </Navbar>
       <BrowserRouter>
           <Switch>
@@ -171,7 +166,8 @@ else if(!context?.userid) {
        
         <CurrentUserContext.Provider value={context}>
         <Navbar color={context?.darkmode ? "dark" : "light"} expand="md">
-        <NavbarBrand href="/" data-tip data-for="home-link"> <img className="home-icon" src={icon}/> 
+        <NavbarBrand href="/" data-tip data-for="home-link"> <img className="home-icon" src={icon}
+         alt="Spot My Lyrics Logo" /> 
         &#160; Spot My Lyrics 
           <ReactTooltip id="home-link" place="bottom" effect="solid">
               Go Home

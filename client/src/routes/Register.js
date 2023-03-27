@@ -1,18 +1,6 @@
 import React from 'react';
 import {
-  Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  Button, Input, InputGroup, InputGroupText,
-   ListGroup, ListGroupItem, Form} from 'reactstrap';
+  Button, Input, InputGroup, InputGroupText} from 'reactstrap';
 import firebase from 'firebase/compat/app';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import 'firebase/compat/auth';

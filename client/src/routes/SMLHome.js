@@ -1,21 +1,10 @@
 import React from "react";
 import debounce from 'lodash.debounce';
 import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './smlhome.css';
 import {
-  Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   Button, Input, InputGroup, ListGroup, ListGroupItem} from 'reactstrap';
 import { CurrentUserContext } from "../CurrentUserContextAndCookies";
 import {config} from "../config.js";

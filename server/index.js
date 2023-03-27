@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import mysql from "mysql2";
-//import cookieParser from "cookie-parser";
 import sessions from "express-session"
 import {createDBPool, callEmailExists, callGetUserIdFromEmailAndTotalSongs, callGetLyricsForUser, 
   callGetUserPlaylists, callGetLyrics, callGetAllUserSongs, callUserExists, registeruser, deletePlaylistForUser} from "./src/database.js";

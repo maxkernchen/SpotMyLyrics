@@ -1,20 +1,9 @@
 import React from 'react';
 import {
   Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   Card,
   CardBody,
-  UncontrolledCollapse,
-  Button, Input, ListGroup, ListGroupItem
+  Button, ListGroup, ListGroupItem
 , Modal, ModalBody, ModalHeader,ModalFooter} from 'reactstrap';
 import { CurrentUserContext } from "../CurrentUserContextAndCookies";
 import { Link } from 'react-router-dom';

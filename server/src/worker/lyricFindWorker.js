@@ -1,7 +1,6 @@
 import Bull from 'bull';
 import { getCurrentApiObj } from '../api/spotifyApiCaller.js';
 import * as Cheerio from 'cheerio';
-import got from 'got';
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
@@ -11,11 +10,8 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
 import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
 import { updatePlayListProgress } from '../../index.js';
-import { Job } from 'bull';
 import { config } from '../config/config.js';
-import { parse } from 'superagent';
 import format from 'string-format';
-
 
 
 const baseMusixMatchSearchUrl = 'https://www.musixmatch.com/search/'
