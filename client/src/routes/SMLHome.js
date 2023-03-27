@@ -40,11 +40,8 @@ export default class SMLHome extends React.Component {
       toastId: ''
     };
 
-   
-
     this.searchLyricsDebounced = debounce(this.searchLyricsDebounceCall, 500);
 
-  
   }
 
   handleInputChangeLyricSearch = (e) => {
@@ -91,6 +88,7 @@ export default class SMLHome extends React.Component {
           if(parsedData.progress === 1){
             events.close();
             this.setState({toastId: ''});
+            window.location.reload();
           }
         }
       };
@@ -178,6 +176,8 @@ export default class SMLHome extends React.Component {
     let searchResults = this.state.searchResults?.results;
     let searchTermLen = this.state?.searchTerm.length;
     let foundSongsList;
+
+    
 
     console.log(this.context);
 
