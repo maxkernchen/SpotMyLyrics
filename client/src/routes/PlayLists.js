@@ -190,8 +190,8 @@ createToast(message, iserror, isplaylist){
       });
   }
   else if (isplaylist){
-    let toastIdCreated = toast.loading('Refreshing Playlist  ' + 
-    this.state.currentlyRefreshingPlaylist, {
+    let toastIdCreated = toast.loading('Refreshing Playlist \"' + 
+    this.state.currentlyRefreshingPlaylist + '\"', {
       position: "bottom-right",
       autoClose: false,
       hideProgressBar: false,

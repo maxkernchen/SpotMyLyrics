@@ -20,8 +20,7 @@ import {
 import { CurrentUserContext } from "../CurrentUserContextAndCookies";
 import {config} from "../config.js";
 
-
-
+const regexPlaylistID = "playlist\\/(.*)\\?";
 
 export default class SMLHome extends React.Component {
   
@@ -70,8 +69,15 @@ export default class SMLHome extends React.Component {
   
 
   async addPlayListClick (){
-   
-    let results = await this.addPlayList(this.state.playList);
+    let playlistString = this.state.playList;
+    // get the playlist id using regex, if the whole url is passed in.
+    const matches = playlistString.matchAll(regexPlaylistID);
+    for (const match of matches) {
+        playlistString = match[1];
+        break;
+    }
+    this.setState({playList: playlistString});
+    let results = await this.addPlayList(playlistString);
     console.log(results.playListName);
     if(!results.error){
       this.createToast(results.playListName);
@@ -111,7 +117,7 @@ export default class SMLHome extends React.Component {
 
   createToast(playListName){
     if(!this.state.toastId){
-      let toastIdCreated = toast.loading('Processing Playlist ' + playListName, {
+      let toastIdCreated = toast.loading('Processing Playlist \"' + playListName +'\"', {
         position: "bottom-right",
         autoClose: false,
         hideProgressBar: false,
@@ -203,6 +209,7 @@ export default class SMLHome extends React.Component {
       <div className="home-center">
     
         <h2>Add Playlist</h2>
+        <h5>Copy the Spotify Playlist URL below</h5>
         <InputGroup>
           
             <Input onChange={e => this.setState({

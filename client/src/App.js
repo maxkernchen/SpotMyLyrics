@@ -139,7 +139,7 @@ else if(!context?.userid) {
     
     <CurrentUserContext.Provider value={context}>
       <Navbar color={context?.darkmode ? "dark" : "light"} expand="md">
-      <NavbarBrand href="/">Spot My Lyrics </NavbarBrand>
+      <NavbarBrand href="/"><img className="home-icon" src={icon}/>&#160;Spot My Lyrics</NavbarBrand>
       </Navbar>
       <BrowserRouter>
           <Switch>
@@ -171,8 +171,8 @@ else if(!context?.userid) {
        
         <CurrentUserContext.Provider value={context}>
         <Navbar color={context?.darkmode ? "dark" : "light"} expand="md">
-        <NavbarBrand href="/" data-tip data-for="home-link"><img className="home-icon" src={icon}/> 
-            Spot My Lyrics 
+        <NavbarBrand href="/" data-tip data-for="home-link"> <img className="home-icon" src={icon}/> 
+        &#160; Spot My Lyrics 
           <ReactTooltip id="home-link" place="bottom" effect="solid">
               Go Home
           </ReactTooltip>
