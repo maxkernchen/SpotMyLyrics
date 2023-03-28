@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import update from 'immutability-helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import fontawesome from '@fortawesome/fontawesome';
-import { faSync, faCircleCheck, faCircleXmark, faArrowsRotate, faTrash, faLeaf } from '@fortawesome/free-solid-svg-icons'
+import { faSync, faCircleCheck, faCircleXmark, faArrowsRotate, faTrash } from '@fortawesome/free-solid-svg-icons'
 import ReactTooltip from "react-tooltip";
 import {config} from '../config'
 
@@ -25,7 +25,6 @@ export default class PlayLists extends React.Component {
   constructor() {
     super()
     toast.configure();
-
     this.state = {
       existingPlaylists: [],
       allUserSongs: [],
@@ -35,12 +34,9 @@ export default class PlayLists extends React.Component {
       currentlyRefreshingPlaylist: '',
       toggleDeleteDialog: new Map()
     };
-
-
-
   }
+  // get all existing playlists and set the state for the buttons for each.
   async getExistingPlayListsSetState() {
-
     let results = await this.getExistingPlaylists();
     this.setState({
       existingPlaylists: results,
@@ -51,12 +47,12 @@ export default class PlayLists extends React.Component {
       this.state.toggleDeleteDialog.set(pl.playlistid, false);
     });
 
-  
-    
   }
+  // call to server to get all existing playlists for this user.
+  //calls server endpoint userplaylists
   async getExistingPlaylists(){
     const payload = JSON.stringify({username: this.context?.userid});
-    return fetch('http://localhost:3001/userplaylists', {
+    return fetch(config.endpointUserPlayList, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -74,9 +70,11 @@ async getAllUserSongsSetState() {
   })
   
 }
+// get all playlists and each song assoicated to the playlist for the specified user
+// calls server endpoint allusersongs
 async getAllUserSongs(){
   const payload = JSON.stringify({username: this.context?.userid});
-  return fetch('http://localhost:3001/allusersongs', {
+  return fetch(config.endpointAllUserSongs, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -85,10 +83,11 @@ async getAllUserSongs(){
   })
     .then(data => data.json())
 }
-
+// delete the entire playlist for the user
+// calls server endpoint deleteplaylist
 async deletePlaylistForUser(playlistid, username){
   const payload = JSON.stringify({playlistid: playlistid, username: username});
-  return fetch('http://localhost:3001/deleteplaylist', {
+  return fetch(config.endpointDeletePlaylist, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -97,7 +96,8 @@ async deletePlaylistForUser(playlistid, username){
   })
     .then(data => data.json())
 }
-
+// call above method to delete playlist and then present user with toast
+// if succesfully deleted or not.
 async deletePlaylist(playlistid, username){
     let results = await this.deletePlaylistForUser(playlistid, username);
     if(results.error){
@@ -110,7 +110,8 @@ async deletePlaylist(playlistid, username){
     this.setState({callGetPlaylists: true});
 
 }
-
+// get the current status of the playlist, if it is being synced or not.
+// if it is being synced disable refresh and deleted buttons and display refreshing icon.
 getPlaylistSyncStatus(playlistdata){
 
   if(playlistdata.currentlysyncing || playlistdata.playlistname === this.state.currentlyRefreshingPlaylist){
@@ -123,19 +124,20 @@ getPlaylistSyncStatus(playlistdata){
       </ReactTooltip> 
     </>
   }
+  // if playlist is not currentling syncing get the current time and 
   else{
     let currentTime = new Date().getTime();
     let playListSyncTime = new Date(playlistdata.lastsynced).getTime();
 
     let minutesDiff = Math.ceil((currentTime - playListSyncTime)/ (1000 * 60));
-    let lastSyncTimeStr = minutesDiff + " Minute(s) ago";
+    let lastSyncTimeStr = minutesDiff + config.minutesAgo;
 
     if(minutesDiff > 59){
       let hoursDiff = Math.ceil((currentTime - playListSyncTime)/ (1000 * 60 * 60));
-      lastSyncTimeStr = hoursDiff + " Hour(s) ago";
+      lastSyncTimeStr = hoursDiff + config.hoursAgo;
         if(hoursDiff > 23){
           let daysDiff = Math.ceil((currentTime - playListSyncTime)/ (1000 * 24 * 60 * 60));
-          lastSyncTimeStr = daysDiff + " Day(s) ago";
+          lastSyncTimeStr = daysDiff + config.daysAgo;
         }
     }
     
@@ -179,8 +181,8 @@ createToast(message, iserror, isplaylist){
       });
   }
   else if (isplaylist){
-    let toastIdCreated = toast.loading('Refreshing Playlist \"' + 
-    this.state.currentlyRefreshingPlaylist + '\"', {
+    let toastIdCreated = toast.loading(config.refreshingPlaylist + '"' + 
+    this.state.currentlyRefreshingPlaylist + '"', {
       position: "bottom-right",
       autoClose: false,
       hideProgressBar: false,
@@ -213,7 +215,7 @@ async addPlayList(playListIDStr){
 
   if(playListIDStr && playListIDStr.trim().length){
     const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: this.context?.userid});
-    return fetch('http://localhost:3001/addplaylist', {
+    return fetch(config.endpointAddPlaylist, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -239,7 +241,7 @@ async refreshPlaylist(playlistid, playlistname)  {
     this.setState({callGetPlaylists: true});
     this.createToast(results.playListName, false, true);
 
-    const events = new EventSource('http://localhost:3001/playlistprogress');
+    const events = new EventSource(config.endpointPlaylistProgress);
 
     events.onmessage = (event) => {
       const parsedData = JSON.parse(event.data);
