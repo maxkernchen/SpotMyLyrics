@@ -124,7 +124,8 @@ getPlaylistSyncStatus(playlistdata){
       </ReactTooltip> 
     </>
   }
-  // if playlist is not currentling syncing get the current time and 
+  // if playlist is not currently syncing get the lat time it was synced.
+  // then format this time in minutes ago, hours ago, days ago format
   else{
     let currentTime = new Date().getTime();
     let playListSyncTime = new Date(playlistdata.lastsynced).getTime();
@@ -145,7 +146,7 @@ getPlaylistSyncStatus(playlistdata){
   }
 
 }
-
+// set the icon of the song if it is has fetched all lyrics or is missing lyrics 
 getSongSyncStatus(songdata){
 
   if(songdata.lyricsfound){
@@ -166,7 +167,7 @@ getSongSyncStatus(songdata){
   }
 
 }
-
+// helper method to create an error is succesful toast nessage
 createToast(message, iserror, isplaylist){
 
   if(iserror){
@@ -193,7 +194,6 @@ createToast(message, iserror, isplaylist){
       theme: this.context.darkmode ? "dark" : "light"
       });
       // only store toast id for playlist re-sync
-   
     this.setState({toastId: toastIdCreated})
     
   }
@@ -210,7 +210,7 @@ createToast(message, iserror, isplaylist){
   }
 }
 
-
+// add a new playlist by calling the server with the playlist id and the username
 async addPlayList(playListIDStr){
 
   if(playListIDStr && playListIDStr.trim().length){
@@ -226,7 +226,7 @@ async addPlayList(playListIDStr){
   }
 }
 
-
+// refresh the playlist, this will trigger all songs in the playlist to be reloaded. 
 async refreshPlaylist(playlistid, playlistname)  {
   
   // we store the playlist in the db as playlistid_userid to 
@@ -235,14 +235,11 @@ async refreshPlaylist(playlistid, playlistname)  {
   const splitPlayList = playlistid.split("_");
 
   let results = await this.addPlayList(splitPlayList[0]);
-  console.log(results.playListName);
   if(!results.error){
     this.setState({currentlyRefreshingPlaylist: playlistname});
     this.setState({callGetPlaylists: true});
     this.createToast(results.playListName, false, true);
-
     const events = new EventSource(config.endpointPlaylistProgress);
-
     events.onmessage = (event) => {
       const parsedData = JSON.parse(event.data);
       
@@ -263,44 +260,36 @@ async refreshPlaylist(playlistid, playlistname)  {
   else{
     this.createToast(results.error, true, false);
   }
-
-  
-
 }
-
+  // open popup bootstrap modal for this specific playlist
  toggleModal(playlistid){
-  
   this.setState({
   toggleDeleteDialog: update(this.state.toggleDeleteDialog, {[playlistid]: {$set: 
     !this.state.toggleDeleteDialog.get(playlistid)}})
-
   })
-
 }
   render() { 
-
-   
    let playlistResults = this.state.existingPlaylists?.results;
    let allusersongsresults = this.state.allUserSongs?.results;
    let existingPlayListList;
 
-   console.log(this.context);
+   //console.log(this.context);
+   // set dark theme body
    if(this.context.darkmode){
     document.body.classList.add('dark-theme');
     }
     else{
       document.body.classList.remove('dark-theme');
     }
-    
-
+    // if playlist needs to be refreshed get them.
    if(this.state.callGetPlaylists){
      this.getExistingPlayListsSetState();
      this.getAllUserSongsSetState()
      this.setState({callGetPlaylists: false});
    }
-
+   // load all playlists into lists
    if(playlistResults && allusersongsresults && playlistResults.length > 0){
-      console.log(playlistResults);
+      //console.log(playlistResults);
       
       existingPlayListList = playlistResults.map((pl) => 
       <div className="list-div">
@@ -313,12 +302,14 @@ async refreshPlaylist(playlistid, playlistname)  {
             </ReactTooltip>
         </Button>
 
-        <Modal isOpen={this.state.toggleDeleteDialog.get(pl.playlistid)} toggle={()=>this.toggleModal(pl.playlistid)}>
-            <ModalHeader className={this.context.darkmode ? "modal-dark": ""} toggle={()=>this.toggleModal(pl.playlistid)}>
-              Deleting {pl.playlistname}
+        <Modal isOpen={this.state.toggleDeleteDialog.get(pl.playlistid)} 
+          toggle={()=>this.toggleModal(pl.playlistid)}>
+            <ModalHeader className={this.context.darkmode ? "modal-dark": ""} 
+              toggle={()=>this.toggleModal(pl.playlistid)}>
+                Deleting {pl.playlistname}
             </ModalHeader>
             <ModalBody className={this.context.darkmode ? "modal-dark": ""}>
-              Are you sure you want to delete PlayList: "{pl.playlistname}"
+                Are you sure you want to delete PlayList: "{pl.playlistname}"
             </ModalBody>
             <ModalFooter className={this.context.darkmode ? "modal-dark": ""}>
               <Button
@@ -331,7 +322,7 @@ async refreshPlaylist(playlistid, playlistname)  {
                 Cancel
               </Button>
             </ModalFooter>
-          </Modal>
+         </Modal>
 
         <Button outline color="success" className="side-button" 
                 disabled={pl.currentlysyncing} data-tip data-for={pl.playlistid + "_refresh"} 
@@ -342,6 +333,7 @@ async refreshPlaylist(playlistid, playlistname)  {
                 Refresh Playlist
             </ReactTooltip>
         </Button>
+
         <Button className={this.context.darkmode ? 
             "list-dark list-group-item list-group-item-action" : "list-group-item list-group-item-action"} 
        key={pl.playlistname} onClick={ () =>
@@ -349,7 +341,6 @@ async refreshPlaylist(playlistid, playlistname)  {
           collapsePlayListCard: update(this.state.collapsePlayListCard, {[pl.playlistid]: {$set: 
             !this.state.collapsePlayListCard.get(pl.playlistid)}})
         })
-       
        } data-tip data-for={pl.playlistid}>Name: {pl.playlistname} Songs:   
       {pl.songswithlyrics + pl.songswithoutlyrics} {this.getPlaylistSyncStatus.call(this, pl)} 
       
@@ -360,7 +351,8 @@ async refreshPlaylist(playlistid, playlistname)  {
               {allusersongsresults.map((song) => {
 
                   if(song.playlistid === pl.playlistid){
-                    return <ListGroupItem className={this.context.darkmode ? "list-dark" : ""} key={song.url} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
+                    return <ListGroupItem className={this.context.darkmode ? "list-dark" : ""} 
+                          key={song.url} data-tip data-for={song.url}> <img className='album-art-playlist' src={song.albumarturl}/> 
                               &nbsp; {song.artistname} - {song.songname} &nbsp; {this.getSongSyncStatus.call(this, song)}
                           </ListGroupItem>
                   }
@@ -371,17 +363,13 @@ async refreshPlaylist(playlistid, playlistname)  {
         </Card>
       </Collapse>
       </Button>
-    </div>
-      
-      
-      );    
+    </div>);    
     }
+    // no playlists exist
     else{
-
-     existingPlayListList = <ListGroupItem key="no-playlists">No Playlists</ListGroupItem>
-   
+      existingPlayListList = <ListGroupItem className={this.context.darkmode ? "list-dark" : ""} 
+      key="no-playlists">No Playlists</ListGroupItem>
     }
- 
     return(
           <div className="playlist-center">
             <ListGroup flush className="playlist-list">

@@ -41,6 +41,7 @@
     "react-tooltip": "^4.2.21",
     "reactstrap": "^9.0.3",
     "spotify-web-api-node": "^5.0.2",
-    "string-format": "^2.0.0"
+    "string-format": "^2.0.0",
+    "winston": "^3.8.2"
   }
 }

@@ -14,9 +14,9 @@ import fontawesome from '@fortawesome/fontawesome';
 import { faSync, faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import ReactTooltip from "react-tooltip";
 import {config} from '../config'
-
 fontawesome.library.add(faSync, faCircleCheck, faCircleXmark);
 
+// init firebase
 const firebaseConfig = {
   apiKey: config.firebaseApiKey,
   authDomain: config.firebaseAuthDomain,
@@ -26,13 +26,11 @@ const firebaseConfig = {
   appId: config.firebaseAppID,
   measurementId: config.firebaseMeasureID
 };
-
 firebase.initializeApp(firebaseConfig);
 let auth = getAuth();
 
 export default class Register extends React.Component {
     constructor() {
-
       super()
       toast.configure();
       this.state = {
@@ -42,11 +40,8 @@ export default class Register extends React.Component {
         password1: '',
         passwordsmatch: false
       };
-  
-    
     }
-
-
+    // helper method to check if passwords match
     passwordsMatch(){
       if(this.state.password0 && this.state.password1){
         if(this.state.password0 === this.state.password1){
@@ -71,66 +66,64 @@ export default class Register extends React.Component {
       return <></>
   
     }
-
+    // register this user to firebase and then the database as well.
     async registerUser(){
-      console.log(this.state.email + this.state.username);
-
+      //console.log(this.state.email + this.state.username);
       if(!this.state.email || !this.state.username || 
         !this.state.password0 || !this.state.password1){
-          this.createToast("Not all fields defined", true);
+          this.createToast(config.fieldsNotAllDefined, true);
       }
       else if(!(this.state.password0 === this.state.password1)){
-        this.createToast("Passwords don't match", true);
-
+        this.createToast(config.passwordsDontMatch, true);
       }
       else{
-        
-         
-            let errorOccured = false
-            let userFirebase;
-            await createUserWithEmailAndPassword(auth, this.state.email, this.state.password0)
-            .then((userCredential) => {
-              userFirebase = userCredential.user;
-            })
-            .catch((error) => {
-                let errorCode = error.code;
-                let errorMessage = error.message;
-                errorOccured = true;
-                if (errorCode == 'auth/weak-password') {
-                  this.createToast("Password is not strong enough", true);
-                } 
-                else if(errorCode == "auth/email-already-in-use")
-                {
-                  this.createToast("Email is already used", true);
-                }
-                else if (errorCode == "auth/invalid-email"){
-                  this.createToast("Email is not valid", true);
-                }
-                else{
-                  this.createToast("Error occured creating user: " + errorMessage, true);
-                }
-            });
+          let errorOccured = false
+          let userFirebase;
+          // register use to firebase
+          await createUserWithEmailAndPassword(auth, this.state.email, this.state.password0)
+          .then((userCredential) => {
+            userFirebase = userCredential.user;
+          })
+          // any errors during registering user display toast message
+          .catch((error) => {
+              let errorCode = error.code;
+              let errorMessage = error.message;
+              errorOccured = true;
+              if (errorCode == 'auth/weak-password') {
+                this.createToast(config.passwordNotStrong, true);
+              } 
+              else if(errorCode == "auth/email-already-in-use")
+              {
+                this.createToast(config.emailAlreadyUsed, true);
+              }
+              else if (errorCode == "auth/invalid-email"){
+                this.createToast(config.emailInvalid, true);
+              }
+              else{
+                this.createToast(config.errorCreatingUser + errorMessage, true);
+              }
+          });
 
-          if(!errorOccured){
-            let results = await this.registerUserToDatabase(this.state.email, this.state.username);
-            if(results.error){
-              // delete user from Firebase so db and firebase are not out of sync
-              await this.deleteuserFireBase(userFirebase.uid);
-              this.createToast(results.error, true);
-            }
-            else{
-              this.context = {firebaseuser: userFirebase, userid: this.state.username};
-              this.createToast(results.results, false);
-            }
+        if(!errorOccured){
+          let results = await this.registerUserToDatabase(this.state.email, this.state.username);
+          if(results.error){
+            // delete user from Firebase so db and firebase are not out of sync
+            await this.deleteuserFireBase(userFirebase.uid);
+            this.createToast(results.error, true);
           }
+          else{
+            this.context = {firebaseuser: userFirebase, userid: this.state.username};
+            this.createToast(results.results, false);
+          }
+        }
       }
 
     }
 
-
+    // call server to add user to database as well.
     async registerUserToDatabase(email, username){
         const payload = JSON.stringify({email: email.toLowerCase().trim(), username: username.trim()});
-        return fetch('http://localhost:3001/register', {
+        return fetch(config.endpointRegisterUser, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -139,8 +132,7 @@ export default class Register extends React.Component {
         })
           .then(data => data.json())
     }
-    
-
+    // helper method to create a succesful or error toast message.
     createToast(message, iserror){
       if(iserror){
          toast.error(message, {
@@ -164,10 +156,10 @@ export default class Register extends React.Component {
 
       }
     }
+    //
     async deleteuserFireBase(uid){
-
         const payload = JSON.stringify({uid: uid});
-        return fetch('http://localhost:3001/deleteuser', {
+        return fetch(config.endpointDeleteUser, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -228,9 +220,7 @@ export default class Register extends React.Component {
          </Link>
          &nbsp;
          &nbsp;
-      
         <Button color="primary" onClick={() => this.registerUser()}>Register</Button>
-      
       </div>
     }
 }
