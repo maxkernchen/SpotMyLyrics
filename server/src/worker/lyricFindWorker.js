@@ -8,7 +8,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 // add stealth plugin and use defaults (all evasion techniques)
 
 
-import { callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist } from '../database.js';
+import { callGetAllUserPlaylistSongs, callInsertLyricsForUserPlaylist, callInsertOrUpdateSmlPlaylist, deleteSongFromPlaylist } from '../database.js';
 import { updatePlayListProgress } from '../../index.js';
 import { config } from '../config/config.js';
 import format from 'string-format';
@@ -43,15 +43,14 @@ export async function scheduleLyricTask(playListID, username) {
 
     let retResponse = {};
 
-    
-
     if(playlistNameApi){
         // add job in seperate method so we don't block after getting playlist name
         // make sure playlist job is not already running.
         retResponse = addLyricJob(playListID, username, playlistNameApi);
     }
     else{
-        retResponse = {error: format(config.errorPlaylistDoesNotExist, playListID), playListName: playlistNameApi};
+        retResponse = {error: format(config.errorPlaylistDoesNotExist, playListID), 
+            playListName: playlistNameApi};
     }
 
     return retResponse;
@@ -85,7 +84,8 @@ async function addLyricJob(playListID, username, playlistNameApi){
         
     }
     else if (currentJob){
-        return {error: format(config.errorPlayListAlreadyRunning, playlistNameApi), playListName: playlistNameApi};
+        return {error: format(config.errorPlayListAlreadyRunning, playlistNameApi),
+             playListName: playlistNameApi};
     }
     else if(userRunningAnotherJob){
         return {error: config.errorUserAlreadyRunningJob, playListName: playlistNameApi};
@@ -109,6 +109,8 @@ async function lyricWork(job) {
     playListTracks = playListTracks.filter(removePodcasts);
      // dont load any duplicate songs, spotify allows playlists to have duplicate songs.
     playListTracks = playListTracks.filter(removeDuplicateTracks);
+  
+    let currentSongs = await callGetAllUserPlaylistSongs(currentUser, playListID + '_' + currentUser);
     let totalsongs = playListTracks.length;
     console.log(playListTracks);
 
@@ -121,7 +123,7 @@ async function lyricWork(job) {
         let artistName = track.track.artists[0].name.trim();
         let songName = track.track.name.trim();
         let url = track.track.external_urls.spotify;
-        let albumArt = track.track.album.images[0].url;;
+        let albumArt = track.track.album.images[0].url;
               
         console.log('fetching lyrics from web!');
         // TODO if song exists already in DB dont fetch from musix
@@ -139,6 +141,16 @@ async function lyricWork(job) {
         updatePlayListProgress({playListID: playListID, playlistName: playlistName,
              username: currentUser, progress: progress});
         
+    }
+    // delete any songs which are currently stored but no longer in the spotify playlist.
+    for(let i = 0; i < currentSongs.length; i++){
+        const foundSong = playListTracks.findIndex(track => track.track.external_urls.spotify 
+            === currentSongs[i].url);
+        if(foundSong < 0){
+            console.log("found song not in playlist" + currentSongs[i].songname);
+            await deleteSongFromPlaylist(currentUser, playListID + '_' + currentUser ,currentSongs[i].url);
+        }
+
     }
     console.log('Done!');
     // update playlist again as we now know songs with and without lyrics.
@@ -236,7 +248,6 @@ async function getLyricsFromUrl(songUrl, artistName, attempts){
     let artistMatches = false;
     let $;
     do{
-       // await new Promise(r => setTimeout(r, 5000));
         let responseLyrics;
         try {
             

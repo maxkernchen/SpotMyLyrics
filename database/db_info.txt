@@ -15,9 +15,10 @@ create table smlusersongmapping(userid varchar(50), url varchar(200), playlistid
 index user_idx (userid), index url_idx (url), index playlist_idx (playlistid),
  FOREIGN KEY (userid)
         REFERENCES smlusers(userid)
-        ON DELETE CASCADE, FOREIGN KEY (url)
+ 	ON DELETE CASCADE, FOREIGN KEY (url)
         REFERENCES smluserlyrics(url)
-        ON DELETE CASCADE, FOREIGN KEY (playlistid)
+        ON DELETE CASCADE,
+        FOREIGN KEY (playlistid)
         REFERENCES smlplaylist(playlistid)
         ON DELETE CASCADE);
 
@@ -115,6 +116,17 @@ CREATE PROCEDURE getallusersongs(IN userid VARCHAR(50))
 	JOIN spotmylyricsdb.smlusersongmapping mp ON mp.userid = userid
 	AND p.playlistid = mp.playlistid
 	JOIN spotmylyricsdb.smluserlyrics sul ON sul.url = mp.url;
+
+END//
+
+       
+CREATE PROCEDURE getalluserplaylistsongs(IN userid VARCHAR(50), IN playlistid varchar(400))
+	BEGIN
+	SELECT distinct sul.* FROM spotmylyricsdb.smlplaylist p
+	JOIN spotmylyricsdb.smlusersongmapping mp ON mp.userid = userid
+	AND p.playlistid = mp.playlistid
+	JOIN spotmylyricsdb.smluserlyrics sul ON sul.url = mp.url
+	WHERE p.playlistid = playlistid;
 
 END//
 
@@ -226,6 +238,32 @@ END //
         delete from smlplaylist where smlplaylist.playlistid = playlistid;
         --SELECT concat('deleting playlist ', playlistid);
         
+        COMMIT;
+ END//
+
+
+  CREATE PROCEDURE deletesongfromplaylist(IN userid VARCHAR(200), IN playlistid VARCHAR(400), IN url VARCHAR(200))
+  
+	BEGIN
+         DECLARE songurltodelete VARCHAR(200) DEFAULT "";
+ 	
+	SELECT url INTO songurltodelete from smluserlyrics where url not in (
+		SELECT smluserlyrics.url
+	 	FROM spotmylyricsdb.smluserlyrics
+	 	JOIN spotmylyricsdb.smlusersongmapping ON smlusersongmapping.url = 
+	 	smluserlyrics.url AND (smlusersongmapping.userid <> userid
+	 	OR smlusersongmapping.playlistid <> playlistid)
+	 	) and smluserlyrics.url = url;
+	 	
+	START TRANSACTION;
+
+	  IF(songurltodelete <> "") THEN
+		delete from smluserlyrics where smluserlyrics.url = songurltodelete;
+         END IF;
+
+	delete from smlusersongmapping where smlusersongmapping.playlistid = playlistid
+       	and smlusersongmapping.userid = userid and smlusersongmapping.url = url;
+
         COMMIT;
  END//
 

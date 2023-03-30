@@ -219,6 +219,35 @@ export async function callUserExists(pool, userid){
     return result;
   }
 
+  export async function callGetAllUserPlaylistSongs(userid, playlistid){
+    let result = [];
+
+    const storedProcCall = 'CALL getalluserplaylistsongs(?,?);';
+
+    let conn = await getConnectionPool().promise().getConnection();
+    if(conn){
+      const [rows, fields] = 
+      await conn.connection.promise().query(storedProcCall, [userid, playlistid]);
+
+      conn.connection.release();
+      // get just query results from resultset
+      let rowResult = rows[0];
+      if(rowResult){
+        await Object.keys(rowResult).forEach(function(key) {
+
+          let row = rowResult[key];
+          if(row){
+            result.push({songname: row.songname, artistname: row.artistname, 
+              albumarturl: row.albumart, lyricsfound: row.lyricsfound === 1 ? true : false, url: row.url});
+          }
+        });
+      }
+    }
+    
+    return result;
+  }
+
+
 
    export async function callInsertLyricsForUserPlaylist(url, songname, artistname, albumart, lyrics, lyricsfound, userid, playlistid){
     const storedProcCall = 'CALL insertlyricsforuserplaylist(?, ?, ?, ? ,?, ?, ?, ?);';
@@ -258,7 +287,28 @@ export async function callUserExists(pool, userid){
       }
 
       return playlistDeleted;
+  }
+
+
+  export async function deleteSongFromPlaylist(userid, playlistid, songurl){
+    const storedProcCall = 'CALL deletesongfromplaylist(?, ?, ?);';
+    let songDeleted = false;
+    let conn = await getConnectionPool().promise().getConnection();
+    try{
+      if(conn){
+        const [rows, fields] = 
+        await conn.connection.promise().query(storedProcCall, [userid, playlistid, songurl]);
+        conn.connection.release();
+        songDeleted = true;
+      }
+    }catch(error){
+      console.log("error deleting song from playlist " + error);
+      songDeleted = false;
     }
+
+    return songDeleted;
+}
+
 
     
 

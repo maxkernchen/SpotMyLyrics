@@ -150,7 +150,8 @@ export default class SMLHome extends React.Component {
   async addPlayList(playListIDStr){
 
       if(playListIDStr && playListIDStr.trim().length){
-        const payload = JSON.stringify({playlistid: playListIDStr.trim(), username: this.context?.userid});
+        const payload = JSON.stringify({playlistid: playListIDStr.trim(), 
+          username: this.context?.userid});
         return fetch('http://localhost:3001/addplaylist', {
           method: 'POST',
           headers: {
@@ -162,11 +163,8 @@ export default class SMLHome extends React.Component {
       }
     }
 
-
-
   render() { 
 
-  
     
     let searchResults = this.state.searchResults?.results;
     let searchTermLen = this.state?.searchTerm.length;
