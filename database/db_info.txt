@@ -207,7 +207,7 @@ END //
          DECLARE songurltodelete VARCHAR(200) DEFAULT "";
  	 DECLARE finished INTEGER DEFAULT 0;
 
-         -- cursor for songs which we are okay to delete, no other user or playlist has these stored.
+
          DECLARE cursorsongstodelete 
 		CURSOR FOR 
 			SELECT url from smluserlyrics where url not in (
@@ -230,13 +230,13 @@ END //
 		END IF;
 		delete from smluserlyrics where url = songurltodelete;
 		
-		--SELECT concat('deleting song ', songurltodelete);
+
 	END LOOP songstodeleteloop;
 	
         CLOSE cursorsongstodelete;
          
         delete from smlplaylist where smlplaylist.playlistid = playlistid;
-        --SELECT concat('deleting playlist ', playlistid);
+
         
         COMMIT;
  END//
