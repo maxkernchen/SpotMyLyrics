@@ -1,39 +1,21 @@
 import React from 'react';
-
 import './songlyrics.css';
-
 import { CurrentUserContext } from '../CurrentUserContextAndCookies';
-
+import {config} from "../config.js";
 const url = require('url');
-
-
 
 export default class SongLyrics extends React.Component {
   constructor() {
     super()
-
     this.state = {
-      fullSongLyrics: {},
-      isOpen: false
-      
+      fullSongLyrics: {}
     };
-    this.toggle = this.toggle.bind(this);
-  
   }
-  toggle() {
-    this.setState({
-      isOpen: !this.state.isOpen
-    });
-
-    
-  }
-
-
+  // get lyrics for this song url and the current user. 
   async getLyricsForUrlRequest(url){
-
     if(url && url.trim().length){
       const payload = JSON.stringify({songurl: url, username: this.context?.userid});
-      return fetch('http://localhost:3001/getlyrics', {
+      return fetch(config.endpointGetLyrics, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -43,29 +25,25 @@ export default class SongLyrics extends React.Component {
         .then(data => data.json());
     };
   }
-
+  // get lyrics from the passed in url and then store them in the state
   async getLyricsFromUrl(url){
     let results = await this.getLyricsForUrlRequest(url);
-    console.log(results);
+    //console.log(results);
     this.setState({
       fullSongLyrics: results
     })
 
   }
   
-  
-
-   render() { 
-    
+  render() { 
+    // display lyrics on the page either from the state or fetch them again from DB
     let lyricPayload = url.parse(window.location.href,true).query;
     let lyricsExist = this.state.fullSongLyrics?.results;
 
     if(!lyricsExist){
       this.getLyricsFromUrl(lyricPayload.url);
     }
-    
     return(
-
        <>
        <br/>
         <img className="album-art-lyrics" src={this.state.fullSongLyrics.results?.albumarturl}></img>
@@ -81,5 +59,5 @@ export default class SongLyrics extends React.Component {
         );
     }
 }
-
+// context that's shared amongst pages
 SongLyrics.contextType = CurrentUserContext;

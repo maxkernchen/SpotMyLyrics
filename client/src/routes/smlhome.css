@@ -1,8 +1,7 @@
 :root {
     --dark-theme-color: rgb(48, 46, 46);
     --green-dark: rgb(74, 138, 48);
-  }
-
+}
 .home-center{
     text-align: center;
     margin-left: 10%;
@@ -13,7 +12,6 @@
     margin-left: 25%;
     margin-right: 25%;
 }
-
 .album-art-search{
     margin-left: auto;
     margin-right: auto;
@@ -30,9 +28,7 @@
     border-top-left-radius: 20px!important;
     border-top-right-radius: 20px!important;
 }
-
 .list-results {  
-
     border-bottom-left-radius: 20px!important;
     border-bottom-right-radius: 20px!important;
 }

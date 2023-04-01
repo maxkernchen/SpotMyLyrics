@@ -4,7 +4,7 @@ import {
 import firebase from 'firebase/compat/app';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import 'firebase/compat/auth';
-import { CurrentUserContext, verifyUserAndEmail } from "../CurrentUserContextAndCookies";
+import { CurrentUserContext } from "../CurrentUserContextAndCookies";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
@@ -16,7 +16,7 @@ import ReactTooltip from "react-tooltip";
 import {config} from '../config'
 fontawesome.library.add(faSync, faCircleCheck, faCircleXmark);
 
-// init firebase
+// init firebase object
 const firebaseConfig = {
   apiKey: config.firebaseApiKey,
   authDomain: config.firebaseAuthDomain,
@@ -156,7 +156,7 @@ export default class Register extends React.Component {
 
       }
     }
-    //
+    // delete the firstbase user if the registration failed 
     async deleteuserFireBase(uid){
         const payload = JSON.stringify({uid: uid});
         return fetch(config.endpointDeleteUser, {
@@ -224,6 +224,6 @@ export default class Register extends React.Component {
       </div>
     }
 }
-
+// context that's shared amongst pages
 Register.contextType = CurrentUserContext;
 
