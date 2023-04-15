@@ -11,7 +11,9 @@ Any user can register an account for Spot My Lyrics at the below website:
 http://192.210.137.126/spotmylyrics
 
 Also feel free to use the built in test user:
+
 Email: smluser@test.com
+
 Password: SML1234
 
 Technical Features:
