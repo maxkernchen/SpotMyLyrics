@@ -1,6 +1,6 @@
 # Spot My Lyrics
 
-Spot My Lyrics is a React app with a with Express Server backend and a MySQL database for storage. 
+Spot My Lyrics is a React app with an Express Server backend and a MySQL database for storage. 
 This app can load any public Spotify Playlist and then fetch lyrics for each song in the playlist. 
 The lyrics are fetch from musixmatch.com with a headless browser, which is the same provider Spotify uses for their lyric screens.
 These lyrics will then be stored and searchable. 
